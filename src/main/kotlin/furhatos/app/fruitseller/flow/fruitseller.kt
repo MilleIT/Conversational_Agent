@@ -174,6 +174,9 @@ val checkinCancel = state(Interaction){
             furhat.say { "Alright then, please tell me if you'd like to start over." +
                     " Otherwise, I wish you a good day." }
     }
+    onNoResponse {
+        goto(Start)
+    }
 }
 
 val numberOfPeopleChange = state(Interaction) {
