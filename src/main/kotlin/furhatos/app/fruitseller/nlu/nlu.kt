@@ -17,6 +17,12 @@ class RequestOptions: Intent() {
 
 class PeopleList : ListEntity<QuantifiedPeople>()
 
+class UserName(var name : String? = null) {
+    override fun toString(): String {
+        return "@name"
+    }
+}
+
 class QuantifiedPeople(
         var count : Number? = Number(1),
         var person : Person? = null) : ComplexEnumEntity() {
@@ -24,9 +30,9 @@ class QuantifiedPeople(
         return listOf("@count @person", "@person")
     }
 
-    fun getCount(): Int {
-        return generate("$count").toInt()
-    }
+//    fun getCount(): Int {
+//        return generate("$count").toInt()
+//    }
 
     override fun toText(): String {
         return generate("${count?.value}")
@@ -65,3 +71,14 @@ class TellPeople(var people: PeopleList? = null) : Intent() {
         return listOf("@people")
     }
 }
+
+class GiveName(var name: UserName? = null) : Intent(){
+    override fun getExamples(lang: Language): List<String> {
+        return listOf("@name")
+    }
+}
+
+
+
+
+

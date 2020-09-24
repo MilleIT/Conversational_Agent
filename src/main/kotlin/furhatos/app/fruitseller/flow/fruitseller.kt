@@ -130,17 +130,17 @@ val FurtherDetails = state(Interaction) {
     }
 
     onPartialResponse<GiveName> {
-        furhat.say("Yes partial")
+        furhat.say("Yes name partial")
         raise(it, it.secondaryIntent)
     }
 
     onPartialResponse<GiveLengthStay> {
-        furhat.say("Yes partial")
+        furhat.say("Yes length partial")
         raise(it, it.secondaryIntent)
     }
 
     onPartialResponse<GiveRoomClass> {
-        furhat.say("Yes partial")
+        furhat.say("Yes room partial")
         raise(it, it.secondaryIntent)
     }
 
