@@ -203,6 +203,28 @@ val Explaining = state(Interaction) {
     }
 }
 
+val EndWishes = state(Interaction) {
+    onEntry {
+        furhat.ask("All right, your demands have been noted and will be read by the crew. Let's move on then.")
+        goto(StarshipActivities)
+    }
+}
+
+val NoWishes = state(Interaction) {
+    onEntry {
+        furhat.ask("Alright, then let's move on.")
+        goto(StarshipActivities)
+    }
+}
+
+val StarshipActivities = state(Interaction) {
+    onEntry {
+        furhat.ask("On Starship Enterprise we offer numerous simulated activities, namely: " +
+                "Skiing, Tennis, Badminton, and Zombie Survival. Please tell me which ones of those activities " +
+                "you would like to sign up for today.")
+    }
+}
+
 /*
 fun OrderReceived(fruits: FruitList) : State = state(Options) {
     onEntry {
