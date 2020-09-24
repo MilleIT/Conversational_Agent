@@ -114,6 +114,25 @@ val FurtherDetails = state(Interaction) {
                 "or the Citizen-class rooms? (suite class have 2 beds, citizen-class have 1 bed)")
     }
 
+    onResponse<Yes> {
+        furhat.say("Yes")
+        reentry()
+    }
+
+    onResponse<No> {
+        furhat.say("No")
+        reentry()
+    }
+
+    onPartialResponse<Yes> {
+        furhat.say("Yes partial")
+        raise(it, it.secondaryIntent)
+    }
+
+    onPartialResponse<No> {
+        furhat.say("No partial")
+        raise(it, it.secondaryIntent)
+    }
 
 }
 
