@@ -8,6 +8,7 @@ import furhatos.app.fruitseller.order
 import furhatos.flow.kotlin.*
 import furhatos.nlu.common.*
 import furhatos.util.Language
+import kotlin.random.Random
 
 val Start = state(Interaction) {
     onEntry {
@@ -166,6 +167,60 @@ val starshipOverloaded = state(Interaction) {
     onNoResponse {
         goto(checkinCancel)
     }
+}
+
+val specificWishes = state(Interaction){
+    onEntry {
+        furhat.ask("Amazing. The data has been entered to your name, @username. Now," +
+            "before asking you about the different activities we offer on board, I would like to" +
+            "ask you if you have any specific wishes for your stay here?")
+    }
+    onResponse<No> {
+        furhat.say { "Allright, then let's move on." }
+        goto(starshipActivities)
+    }
+    onResponse<TellWish> {
+        goto(extraWish)
+    }
+}
+
+val extraWish = state(Interaction){
+    onEntry {
+        var random = Random.nextInt(1, 3)
+        if(random == 1 ){
+            furhat.ask("Understood. Anything else?")
+        }
+        else if(random == 2){
+            furhat.ask("Do you have any more wishes?")
+        }
+        else if(random == 3){
+            furhat.ask("Is there something else you wish for?")
+
+        }
+    }
+    onResponse<TellWish> {
+        reentry()
+    }
+    onResponse<No> {
+        furhat.say("All right, your demands have been noted" +
+                "and will be read by the crew. Let's move on then.")
+        goto(starshipActivities)
+    }
+}
+
+val starshipActivities = state(Interaction){
+    onEntry {
+        furhat.ask("On Starship Enterprise we offer numerous simulated activities, namely:" +
+                "Skiing, Tennis, Badminton, and Zombie Survival. Please tell me which ones of" +
+                "those activities you would like to sign up for today.")
+    }
+    onResponse<No> {
+        furhat.say ("Understood. You have now successfully checked in. You will soon be teleported to your" +
+                "room, and your luggage will be delivered by our staff. We hope your stay at Starship" +
+                "Enterprise will be a fun and relaxing one.")
+        goto(Start)
+    }
+    //onResponse<activitiesList>
 
 }
 

@@ -11,8 +11,8 @@ class BookingData (
         var name : String? = null,
         var lengthStay : Number? = Number(0),
         var lengthType : String? = null,
-        var roomClass : String? = null
-
+        var roomClass : String? = null,
+        var wish : String? = null
 )
 
 

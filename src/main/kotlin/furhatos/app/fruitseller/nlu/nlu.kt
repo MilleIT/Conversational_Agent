@@ -110,6 +110,21 @@ class GiveName(var name: UserName? = null) : Intent(){
 }
 
 
+class Wish(var wish : String? = null) {
+    override fun toString(): String {
+        return "@wish"
+    }
+}
+
+class TellWish(var wish: Wish? = null) : Intent(){
+    override fun getExamples(lang: Language): List<String> {
+        return listOf("@wish")
+    }
+}
+
+
+
+
 
 
 
