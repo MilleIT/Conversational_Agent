@@ -122,7 +122,7 @@ val starshipOverloaded = state(Interaction) {
         furhat.say(" Unfortunately there are no rooms left of this kind. " +
                 "We only have <number> rooms of this kind free. " +
                 "Would you like to change the number of people you are checking in?")
-        furhat.say { rooms }
+        furhat.say { "rooms" }
         furhat.ask("rooms of this kind free. " +
                 "Would you like to change the number of people you are checking in?", timeout = 5000)
     }
@@ -151,6 +151,25 @@ val numberOfPeopleChange = state(Interaction) {
         furhat.ask(" Wonderful. Please tell me how many guests you would like to check in.")
     }
 
+    onResponse<Yes> {
+        furhat.say("Yes")
+        reentry()
+    }
+
+    onResponse<No> {
+        furhat.say("No")
+        reentry()
+    }
+
+    onPartialResponse<Yes> {
+        furhat.say("Yes partial")
+        raise(it, it.secondaryIntent)
+    }
+
+    onPartialResponse<No> {
+        furhat.say("No partial")
+        raise(it, it.secondaryIntent)
+    }
 
 }
 
