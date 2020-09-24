@@ -114,6 +114,43 @@ val FurtherDetails = state(Interaction) {
                 "or the Citizen-class rooms? (suite class have 2 beds, citizen-class have 1 bed)")
     }
 
+}
+
+
+val starshipOverloaded = state(Interaction) {
+    onEntry {
+        furhat.say(" Unfortunately there are no rooms left of this kind. " +
+                "We only have <number> rooms of this kind free. " +
+                "Would you like to change the number of people you are checking in?")
+        furhat.say { rooms }
+        furhat.ask("rooms of this kind free. " +
+                "Would you like to change the number of people you are checking in?", timeout = 5000)
+    }
+
+    onResponse<No> {
+        goto(checkinCancel)
+    }
+    onResponse<Yes> {
+        goto(numberOfPeopleChange)
+    }
+    onNoResponse {
+        goto(checkinCancel)
+    }
+
+}
+
+val checkinCancel = state(Interaction){
+    onEntry {
+            furhat.say { "Alright then, please tell me if you'd like to start over." +
+                    " Otherwise, I wish you a good day." }
+    }
+}
+
+val numberOfPeopleChange = state(Interaction) {
+    onEntry {
+        furhat.ask(" Wonderful. Please tell me how many guests you would like to check in.")
+    }
+
 
 }
 
