@@ -114,6 +114,36 @@ val FurtherDetails = state(Interaction) {
                 "or the Citizen-class rooms? (suite class have 2 beds, citizen-class have 1 bed)")
     }
 
+    onResponse<GiveName> {
+        furhat.say("Yes")
+        reentry()
+    }
+
+    onResponse<GiveLengthStay> {
+        furhat.say("No")
+        reentry()
+    }
+
+    onResponse<GiveRoomClass> {
+        furhat.say("No")
+        reentry()
+    }
+
+    onPartialResponse<GiveName> {
+        furhat.say("Yes partial")
+        raise(it, it.secondaryIntent)
+    }
+
+    onPartialResponse<GiveLengthStay> {
+        furhat.say("Yes partial")
+        raise(it, it.secondaryIntent)
+    }
+
+    onPartialResponse<GiveRoomClass> {
+        furhat.say("Yes partial")
+        raise(it, it.secondaryIntent)
+    }
+
 }
 
 
@@ -149,26 +179,6 @@ val checkinCancel = state(Interaction){
 val numberOfPeopleChange = state(Interaction) {
     onEntry {
         furhat.ask(" Wonderful. Please tell me how many guests you would like to check in.")
-    }
-
-    onResponse<Yes> {
-        furhat.say("Yes")
-        reentry()
-    }
-
-    onResponse<No> {
-        furhat.say("No")
-        reentry()
-    }
-
-    onPartialResponse<Yes> {
-        furhat.say("Yes partial")
-        raise(it, it.secondaryIntent)
-    }
-
-    onPartialResponse<No> {
-        furhat.say("No partial")
-        raise(it, it.secondaryIntent)
     }
 
 }
