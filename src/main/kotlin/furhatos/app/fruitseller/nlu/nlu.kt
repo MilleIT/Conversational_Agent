@@ -122,6 +122,34 @@ class TellWish(var wish: Wish? = null) : Intent(){
     }
 }
 
+class Activities : EnumEntity(stemming = true, speechRecPhrases = true) {
+    override fun getEnum(lang: Language): List<String> {
+        return listOf("Skiing", "Tennis", "Badminton", "Zombie Survival")
+    }
+}
+
+class ActivitiesList : ListEntity<QuantifiedActivities>()
+
+class QuantifiedActivities(
+        val count : furhatos.nlu.common.Number? = Number(1),
+        val activity : Activities? = null) : ComplexEnumEntity() {
+
+    override fun getEnum(lang: Language): List<String> {
+        return listOf("@count @activity", "@activity")
+    }
+
+    override fun toText(): String {
+        return generate("$count $activity")
+    }
+}
+
+class listActivities(val activities : ActivitiesList? = null) : Intent() {
+    override fun getExamples(lang: Language): List<String> {
+        return listOf("@activities")
+    }
+}
+
+
 
 
 

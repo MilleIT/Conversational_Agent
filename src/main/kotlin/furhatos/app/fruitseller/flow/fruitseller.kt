@@ -18,6 +18,8 @@ val Start = state(Interaction) {
     }
     onResponse<CheckIn> {
         goto(CheckingIn)
+        // temp to get to wish state
+//        goto(specificWishes)
     }
     onResponse<Confusion> {
         goto(Explaining)
@@ -172,12 +174,11 @@ val starshipOverloaded = state(Interaction) {
 val specificWishes = state(Interaction){
     onEntry {
         furhat.ask("Amazing. The data has been entered to your name, @username. Now," +
-            "before asking you about the different activities we offer on board, I would like to" +
+            "before asking you about the different activities we offer on board, I would like to " +
             "ask you if you have any specific wishes for your stay here?")
     }
     onResponse<No> {
-        furhat.say { "Allright, then let's move on." }
-        goto(starshipActivities)
+        goto(noWishes)
     }
     onResponse<TellWish> {
         goto(extraWish)
@@ -202,9 +203,7 @@ val extraWish = state(Interaction){
         reentry()
     }
     onResponse<No> {
-        furhat.say("All right, your demands have been noted" +
-                "and will be read by the crew. Let's move on then.")
-        goto(starshipActivities)
+        goto(endWishes)
     }
 }
 
@@ -220,7 +219,12 @@ val starshipActivities = state(Interaction){
                 "Enterprise will be a fun and relaxing one.")
         goto(Start)
     }
-    //onResponse<activitiesList>
+    onResponse<listActivities>{
+        furhat.say ("Understood. You have now successfully checked in. You will soon be teleported to your" +
+                "room, and your luggage will be delivered by our staff. We hope your stay at Starship" +
+                "Enterprise will be a fun and relaxing one.")
+        goto(Start)
+    }
 
 }
 
@@ -258,27 +262,20 @@ val Explaining = state(Interaction) {
     }
 }
 
-val EndWishes = state(Interaction) {
+val endWishes = state(Interaction) {
     onEntry {
-        furhat.ask("All right, your demands have been noted and will be read by the crew. Let's move on then.")
-        goto(StarshipActivities)
+        furhat.say("All right, your demands have been noted and will be read by the crew. Let's move on then.")
+        goto(starshipActivities)
     }
 }
 
-val NoWishes = state(Interaction) {
+val noWishes = state(Interaction) {
     onEntry {
-        furhat.ask("Alright, then let's move on.")
-        goto(StarshipActivities)
+        furhat.say("Alright, then let's move on.")
+        goto(starshipActivities)
     }
 }
 
-val StarshipActivities = state(Interaction) {
-    onEntry {
-        furhat.ask("On Starship Enterprise we offer numerous simulated activities, namely: " +
-                "Skiing, Tennis, Badminton, and Zombie Survival. Please tell me which ones of those activities " +
-                "you would like to sign up for today.")
-    }
-}
 
 /*
 fun OrderReceived(fruits: FruitList) : State = state(Options) {
