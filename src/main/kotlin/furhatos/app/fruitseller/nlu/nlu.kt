@@ -109,14 +109,27 @@ class GiveName(var name: UserName? = null) : Intent(){
     }
 }
 
-
-class Wish(var wish : String? = null) {
-    override fun toString(): String {
-        return "@wish"
+class Wishes : EnumEntity(stemming = true, speechRecPhrases = true) {
+    override fun getEnum(lang: Language): List<String> {
+        return listOf("extra blanket", "bottle of water", "Room service")
     }
 }
 
-class TellWish(var wish: Wish? = null) : Intent(){
+class WishList : ListEntity<QuantifiedWishes>()
+
+class QuantifiedWishes(
+        val count : furhatos.nlu.common.Number? = Number(1),
+        val wish : Wishes? = null) : ComplexEnumEntity() {
+
+    override fun getEnum(lang: Language): List<String> {
+        return listOf("@count @wish", "@wish")
+    }
+
+    override fun toText(): String {
+        return generate("$count $wish")
+    }
+}
+class TellWish(val wish : WishList? = null) : Intent() {
     override fun getExamples(lang: Language): List<String> {
         return listOf("@wish")
     }
