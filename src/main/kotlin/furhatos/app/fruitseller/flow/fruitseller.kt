@@ -141,7 +141,7 @@ val FurtherDetails = state(Interaction) {
 
     onPartialResponse<GiveRoomClass> {
         furhat.say("Yes room partial")
-        raise(it, it.secondaryIntent)
+
     }
 
 }

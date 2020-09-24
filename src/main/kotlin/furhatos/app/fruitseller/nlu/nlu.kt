@@ -48,6 +48,12 @@ class Person : EnumEntity(stemming = true, speechRecPhrases = true) {
     }
 }
 
+class Staytype : EnumEntity(stemming = true, speechRecPhrases = true) {
+    override fun getEnum(lang: Language): List<String> {
+        return listOf("day", "days", "week", "weeks")
+    }
+}
+
 //class BuyFruit(var fruits : FruitList? = null) : Intent() {
 //    override fun getExamples(lang: Language): List<String> {
 //        return listOf("@fruits", "I want @fruits", "I would like @fruits", "I want to buy @fruits")
@@ -69,6 +75,31 @@ class Confusion() : Intent() {
 class TellPeople(var people: PeopleList? = null) : Intent() {
     override fun getExamples(lang: Language): List<String> {
         return listOf("@people")
+    }
+}
+
+class StayList : ListEntity<QuantifiedStay>()
+
+class QuantifiedStay(
+        var count : Number? = Number(1),
+        var stay : Staytype? = null) : ComplexEnumEntity() {
+    override fun getEnum(lang: Language): List<String> {
+        return listOf("@count @stay")
+    }
+
+    override fun toText(): String {
+        return generate("${count?.value} " + "${stay?.value}")
+    }
+}
+class GiveLengthStay(var stay: StayList? = null) : Intent() {
+    override fun getExamples(lang: Language): List<String> {
+        return listOf("@stay")
+    }
+}
+
+class GiveRoomClass() : Intent() {
+    override fun getExamples(lang: Language): List<String> {
+        return listOf("Suite", "Class")
     }
 }
 
