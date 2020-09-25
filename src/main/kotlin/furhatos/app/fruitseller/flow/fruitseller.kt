@@ -18,8 +18,6 @@ val Start = state(Interaction) {
     }
     onResponse<CheckIn> {
         goto(CheckingIn)
-        // temp to get to wish state
-//        goto(specificWishes)
     }
     onResponse<Confusion> {
         goto(Explaining)
@@ -194,18 +192,23 @@ val StarshipActivities = state(Interaction){
                 "those activities you would like to sign up for today.")
     }
     onResponse<No>{
-        furhat.say("Understood. You have now successfully checked in. You will soon be teleported to your" +
-                "room, and your luggage will be delivered by our staff. We hope your stay at Starship" +
-                "Enterprise will be a fun and relaxing one.")
-        goto(Start)
+        goto(endState)
     }
     onResponse<listActivities>{
         furhat.say("Understood. You have now successfully checked in. You will soon be teleported to your" +
                 "room, and your luggage will be delivered by our staff. We hope your stay at Starship" +
                 "Enterprise will be a fun and relaxing one.")
-        goto(Start)
+        goto(endState)
     }
 
+}
+
+val endState = state(Interaction){
+    onEntry {
+        furhat.say("Understood. You have now successfully checked in. You will soon be teleported to your" +
+                "room, and your luggage will be delivered by our staff. We hope your stay at Starship" +
+                "Enterprise will be a fun and relaxing one.")
+    }
 }
 
 val CheckinCancel = state(Interaction){

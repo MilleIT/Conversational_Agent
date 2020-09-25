@@ -23,8 +23,8 @@ val Idle : State = state {
         furhat.setVoice(Language.ENGLISH_US, "Matthew")
         if (users.count > 0) {
             furhat.attend(users.random)
-//            goto(Start)
-            goto(SpecificWishes)
+            goto(Start)
+//            goto(SpecificWishes)
         }
     }
 
@@ -36,7 +36,7 @@ val Idle : State = state {
 
     onUserEnter {
         furhat.attend(it)
-        //goto(Start)
+//        goto(Start)
         goto(FurtherDetails)
     }
 }
