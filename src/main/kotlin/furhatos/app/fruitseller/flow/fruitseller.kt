@@ -169,8 +169,10 @@ val checkRooms : State = state(Interaction){
         val SuitesAvailable : Int? = users.current.book.suiteRooms?.value
         val CitroomsAvailable : Int? = users.current.book.citiRooms?.value
         if (users.current.book.roomClass == "suite") {
-            SuitesNeeded = people?.div(2) // not tested if this floors or ceilings, but it needs to floor
-            CitroomsNeeded = people?.rem(2)
+            SuitesNeeded = people?.div(2) // not tested if this floors or ceilings, but it needs to ceiling
+            CitroomsNeeded = 0 // use this if line below is NOT used.
+            // CitroomsNeeded = people?.rem(2) // for uneven people and suite choice, eg 3 people = 1 suite and 1 citizen room.
+            // if line above is used, SuitesNeeded needs to floor.
         }
         if ((SuitesAvailable!! >= SuitesNeeded!!) && (CitroomsAvailable!! >= CitroomsNeeded!!)) {
             users.current.book.suiteRooms = Number(SuitesAvailable - SuitesNeeded)
