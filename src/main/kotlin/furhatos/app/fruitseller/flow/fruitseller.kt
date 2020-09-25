@@ -52,7 +52,7 @@ val Start = state(Interaction) {
 val CheckingIn = state(Interaction) {
     onEntry {
         random(
-            { furhat.ask(" Great! As the travel is longer than two days on our journey to Vulkan," +
+            { furhat.ask("Great! As the travel is longer than two days on our journey to Vulkan," +
                     " regulation requires we ask a few questions. Is that okay with you?") })
     }
 
@@ -67,7 +67,7 @@ val CheckingIn = state(Interaction) {
 
 val NoInfo = state(Interaction) {
     onEntry {
-        furhat.ask(" Without your information I cannot book you in. Are you sure")
+        furhat.ask("Without your information I cannot book you in. Are you sure")
     }
     onResponse<Yes> {
         furhat.say { "Goodbye then" }
@@ -112,7 +112,7 @@ val RandomQuestion = state(Interaction) {
 
 val FurtherDetails = state(Interaction) {
     onEntry {
-        furhat.ask(" Perfect. Now, could you give me your name, how long you intend to stay on" +
+        furhat.ask("Perfect. Now, could you give me your name, how long you intend to stay on" +
                 "Starship Enterprise, and whether you would like to stay in our Suite-class rooms" +
                 "or the Citizen-class rooms? (suite class have 2 beds, citizen-class have 1 bed)")
     }
@@ -152,7 +152,7 @@ val FurtherDetails = state(Interaction) {
 
 val starshipOverloaded = state(Interaction) {
     onEntry {
-        furhat.say(" Unfortunately there are no rooms left of this kind. " +
+        furhat.say("Unfortunately there are no rooms left of this kind. " +
                 "We only have <number> rooms of this kind free. " +
                 "Would you like to change the number of people you are checking in?")
         furhat.say { "rooms" }
@@ -240,7 +240,7 @@ val checkinCancel = state(Interaction){
 
 val numberOfPeopleChange = state(Interaction) {
     onEntry {
-        furhat.ask(" Wonderful. Please tell me how many guests you would like to check in.")
+        furhat.ask("Wonderful. Please tell me how many guests you would like to check in.")
     }
 
 }
@@ -248,7 +248,7 @@ val numberOfPeopleChange = state(Interaction) {
 val Explaining = state(Interaction) {
     onEntry {
         random(
-                { furhat.ask(" Welcome to StarShip Enterprise. We are currently leaving" +
+                { furhat.ask("Welcome to StarShip Enterprise. We are currently leaving" +
                         " for a 12-day voyage from planet Earth to planet Vulkan." +
                         " My name is Data and I am your check-in assistant for today." +
                         " Would you like to check in?") })

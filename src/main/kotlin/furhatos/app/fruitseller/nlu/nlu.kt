@@ -111,7 +111,7 @@ class GiveName(var name: UserName? = null) : Intent(){
 
 class Wishes : EnumEntity(stemming = true, speechRecPhrases = true) {
     override fun getEnum(lang: Language): List<String> {
-        return listOf("extra blanket", "bottle of water", "Room service")
+        return listOf("extra blanket", "bottle of water", "room service")
     }
 }
 
@@ -129,6 +129,7 @@ class QuantifiedWishes(
         return generate("$count $wish")
     }
 }
+
 class TellWish(val wish : WishList? = null) : Intent() {
     override fun getExamples(lang: Language): List<String> {
         return listOf("@wish")
