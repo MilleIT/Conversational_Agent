@@ -4,6 +4,7 @@ import furhatos.nlu.*
 import furhatos.nlu.grammar.Grammar
 import furhatos.nlu.kotlin.grammar
 import furhatos.nlu.common.Number
+import furhatos.nlu.common.PersonName
 import furhatos.util.Language
 
 class RequestOptions: Intent() {
@@ -17,7 +18,8 @@ class RequestOptions: Intent() {
 
 class PeopleList : ListEntity<QuantifiedPeople>()
 
-class UserName(var name : String? = null) {
+class UserName(
+    var name : PersonName? = null) : ComplexEnumEntity() {
     override fun toString(): String {
         return "@name"
     }
@@ -99,11 +101,11 @@ class GiveLengthStay(var stay: StayList? = null) : Intent() {
 
 class GiveRoomClass() : Intent() {
     override fun getExamples(lang: Language): List<String> {
-        return listOf("Suite", "Class")
+        return listOf("suite", "citizen")
     }
 }
 
-class GiveName(var name: UserName? = null) : Intent(){
+class GiveName(var name: PersonName? = null) : Intent(){
     override fun getExamples(lang: Language): List<String> {
         return listOf("@name")
     }

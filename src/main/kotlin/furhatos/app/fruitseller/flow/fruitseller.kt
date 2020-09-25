@@ -118,17 +118,17 @@ val FurtherDetails = state(Interaction) {
     }
 
     onResponse<GiveName> {
-        furhat.say("Yes")
+        furhat.say("name")
         reentry()
     }
 
     onResponse<GiveLengthStay> {
-        furhat.say("No")
+        furhat.say("stay")
         reentry()
     }
 
     onResponse<GiveRoomClass> {
-        furhat.say("No")
+        furhat.say("room")
         reentry()
     }
 
