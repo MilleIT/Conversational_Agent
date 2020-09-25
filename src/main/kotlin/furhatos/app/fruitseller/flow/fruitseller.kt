@@ -99,15 +99,22 @@ val RandomQuestion = state(Interaction) {
         furhat.ask("Great. By the way, would you like to know about the available amenities in our room?")
     }
     onResponse<Yes> {
-        furhat.say("You are provided a bed, table, a chair, and a Replicator, which allows you to instantly create " +
-                "any dish you've ever wanted to eat, in the comfort of your own room.")
-        goto(FurtherDetails)
+        goto(RandomQuestion1Yes)
     }
 
     onResponse<No> {
         println("the amount of people: " + "${users.current.book.people}")
         goto(FurtherDetails)
     }
+}
+
+val RandomQuestion1Yes = state(Interaction) {
+    onEntry {
+        furhat.ask("You are provided a bed, table, a chair, and a Replicator, which allows you to instantly create " +
+                "any dish you've ever wanted to eat, in the comfort of your own room. ", timeout = 0)
+    }
+
+    onNoResponse { goto (FurtherDetails) }
 }
 
 val FurtherDetails = state(Interaction) {
