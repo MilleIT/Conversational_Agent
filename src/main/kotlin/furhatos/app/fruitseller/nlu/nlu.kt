@@ -93,6 +93,8 @@ class QuantifiedStay(
         return generate("${count?.value} " + "${stay?.value}")
     }
 }
+
+/*
 class GiveLengthStay(var stay: StayList? = null) : Intent() {
     override fun getExamples(lang: Language): List<String> {
         return listOf("@stay")
@@ -108,6 +110,13 @@ class GiveRoomClass() : Intent() {
 class GiveName(var name: PersonName? = null) : Intent(){
     override fun getExamples(lang: Language): List<String> {
         return listOf("@name")
+    }
+}
+*/
+
+class Details(var name: PersonName? = null, var stay: StayList? = null) : Intent() {
+    override fun getExamples(lang: Language): List<String> {
+        return listOf("@name", "@stay", "suite", "citizen")
     }
 }
 
