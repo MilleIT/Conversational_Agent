@@ -52,7 +52,7 @@ class Person : EnumEntity(stemming = true, speechRecPhrases = true) {
 
 class Staytype : EnumEntity(stemming = true, speechRecPhrases = true) {
     override fun getEnum(lang: Language): List<String> {
-        return listOf("day", "days", "week", "weeks")
+        return listOf("day", "week")
     }
 }
 
@@ -94,7 +94,7 @@ class QuantifiedStay(
     }
 }
 
-/*
+
 class GiveLengthStay(var stay: StayList? = null) : Intent() {
     override fun getExamples(lang: Language): List<String> {
         return listOf("@stay")
@@ -112,7 +112,7 @@ class GiveName(var name: PersonName? = null) : Intent(){
         return listOf("@name")
     }
 }
-*/
+
 
 class Details(var name: PersonName? = null, var stay: StayList? = null) : Intent() {
     override fun getExamples(lang: Language): List<String> {

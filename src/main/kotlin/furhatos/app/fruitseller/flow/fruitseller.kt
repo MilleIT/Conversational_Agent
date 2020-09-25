@@ -7,6 +7,7 @@ import furhatos.app.fruitseller.order
 */
 import furhatos.flow.kotlin.*
 import furhatos.nlu.common.*
+import furhatos.nlu.common.Number
 import furhatos.util.Language
 import kotlin.random.Random
 
@@ -18,6 +19,8 @@ val Start = state(Interaction) {
     }
     onResponse<CheckIn> {
         goto(CheckingIn)
+        // temp to get to wish state
+//        goto(specificWishes)
     }
     onResponse<Confusion> {
         goto(Explaining)
@@ -122,11 +125,65 @@ val FurtherDetails = state(Interaction) {
                 "or the Citizen-class rooms? (suite class have 2 beds, citizen-class have 1 bed)")
     }
 
-    onResponse<Details> {
-        goto(SpecificWishes)
+    onResponse<GiveName> {
+        furhat.say("name")
+        reentry()
     }
+
+//    onResponse<GiveLengthStay> {
+//        furhat.say("stay")
+//        reentry()
+//    }
+
+//    onResponse<GiveRoomClass> {
+//        furhat.say("room")
+//        reentry()
+//    }
+
+    onPartialResponse<GiveName> {
+        furhat.say("Yes name partial")
+        val name = it.intent.values[0].toString()
+        users.current.book.name = name
+        raise(it, it.secondaryIntent)
+    }
+
+    onPartialResponse<GiveLengthStay> {
+        furhat.say("Yes length partial")
+        val lengthStay = it.intent.values[0].toString().toInt()
+        val lengthType = it.intent.values[1].toString()
+        users.current.book.lengthStay = Number(lengthStay)
+        users.current.book.lengthType = lengthType
+        raise(it, it.secondaryIntent)
+    }
+
+    onPartialResponse<GiveRoomClass> {
+        furhat.say("Yes room partial")
+        val roomClass = it.intent.values[0].toString()
+        users.current.book.roomClass = roomClass
+
+        goto(Summary)
+
+    }
+
 }
 
+val Summary = state(Interaction) {
+    onEntry {
+        furhat.ask("would you like me to summarize?")
+    }
+    onResponse<Yes> {
+        furhat.say ( "so let me summarize")
+        val name : String? = users.current.book.name
+        val lengthstay : Number? = users.current.book.lengthStay
+        val lengthType : String? = users.current.book.lengthType
+        val roomClass : String? = users.current.book.roomClass
+        println("your name is $name, you want to stay $lengthstay $lengthType, and you want rooms of type $roomClass")
+    }
+
+    onResponse<No> {
+        //goto(NoInfo)
+    }
+}
 
 val StarshipOverloaded = state(Interaction) {
     onEntry {
