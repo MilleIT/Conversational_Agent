@@ -19,6 +19,7 @@ val Start = state(Interaction) {
     }
     onResponse<CheckIn> {
         goto(CheckingIn)
+        //goto(FurtherDetails)
         // temp to get to wish state
 //        goto(specificWishes)
     }
@@ -71,7 +72,7 @@ val NoInfo = state(Interaction) {
         furhat.ask("Without your information I cannot book you in. Are you sure")
     }
     onResponse<Yes> {
-        furhat.say { "Goodbye then" }
+        furhat.say("Goodbye then")
         goto(Idle)
     }
 
@@ -120,49 +121,24 @@ val RandomQuestion1Yes = state(Interaction) {
 
 val FurtherDetails = state(Interaction) {
     onEntry {
-        furhat.ask("Perfect. Now, could you give me your name, how long you intend to stay on" +
-                "Starship Enterprise, and whether you would like to stay in our Suite-class rooms" +
+        val name = furhat.askFor<PersonName>("Perfect. Now, could you give me your name please?")
+        users.current.book.name  = name?.value
+        furhat.ask("Thank you. How long do you intend to stay on" +
+                "Starship Enterprise, and would you like to stay in our Suite-class rooms" +
                 "or the Citizen-class rooms? (suite class have 2 beds, citizen-class have 1 bed)")
     }
 
-    onResponse<GiveName> {
-        furhat.say("name")
-        reentry()
-    }
-
-//    onResponse<GiveLengthStay> {
-//        furhat.say("stay")
-//        reentry()
-//    }
-
-//    onResponse<GiveRoomClass> {
-//        furhat.say("room")
-//        reentry()
-//    }
-
-    onPartialResponse<GiveName> {
-        furhat.say("Yes name partial")
-        val name = it.intent.values[0].toString()
-        users.current.book.name = name
-        raise(it, it.secondaryIntent)
-    }
-
     onPartialResponse<GiveLengthStay> {
-        furhat.say("Yes length partial")
-        val lengthStay = it.intent.values[0].toString().toInt()
-        val lengthType = it.intent.values[1].toString()
-        users.current.book.lengthStay = Number(lengthStay)
-        users.current.book.lengthType = lengthType
+        println("Yes length partial")
+        users.current.book.lengthStay = it.intent.stayL.toString()
         raise(it, it.secondaryIntent)
     }
 
-    onPartialResponse<GiveRoomClass> {
-        furhat.say("Yes room partial")
-        val roomClass = it.intent.values[0].toString()
-        users.current.book.roomClass = roomClass
-
-        goto(Summary)
-
+    onResponse<GiveRoomClass> {
+        println("Yes room")
+        users.current.book.roomClass = it.intent.room.toString()
+        goto(Summary) // is only for testing
+        //goto(checkRooms)
     }
 
 }
@@ -174,25 +150,44 @@ val Summary = state(Interaction) {
     onResponse<Yes> {
         furhat.say ( "so let me summarize")
         val name : String? = users.current.book.name
-        val lengthstay : Number? = users.current.book.lengthStay
-        val lengthType : String? = users.current.book.lengthType
+        val lengthstay : String? = users.current.book.lengthStay
         val roomClass : String? = users.current.book.roomClass
-        println("your name is $name, you want to stay $lengthstay $lengthType, and you want rooms of type $roomClass")
+        println("your name is ${name}, you want to stay ${lengthstay}, and you want rooms of type ${roomClass}")
+        goto(checkRooms)
     }
 
     onResponse<No> {
-        //goto(NoInfo)
+        goto(checkRooms)
+    }
+}
+
+val checkRooms : State = state(Interaction){
+    onEntry {
+        val people : Int? = users.current.book.people?.value
+        var SuitesNeeded : Int? = 0
+        var CitroomsNeeded : Int? = people
+        val SuitesAvailable : Int? = users.current.book.suiteRooms?.value
+        val CitroomsAvailable : Int? = users.current.book.citiRooms?.value
+        if (users.current.book.roomClass == "suite") {
+            SuitesNeeded = people?.div(2) // not tested if this floors or ceilings, but it needs to floor
+            CitroomsNeeded = people?.rem(2)
+        }
+        if ((SuitesAvailable!! >= SuitesNeeded!!) && (CitroomsAvailable!! >= CitroomsNeeded!!)) {
+            users.current.book.suiteRooms = Number(SuitesAvailable - SuitesNeeded)
+            users.current.book.citiRooms = Number(CitroomsAvailable - CitroomsNeeded)
+            goto(SpecificWishes)
+        } else {
+            goto(StarshipOverloaded)
+        }
     }
 }
 
 val StarshipOverloaded = state(Interaction) {
     onEntry {
+        val number : Number? = if (users.current.book.roomClass == "suite") users.current.book.suiteRooms else users.current.book.citiRooms
         furhat.say("Unfortunately there are no rooms left of this kind. " +
-                "We only have <number> rooms of this kind free. " +
-                "Would you like to change the number of people you are checking in?")
-        furhat.say("rooms")
-        furhat.ask("rooms of this kind free. " +
-                "Would you like to change the number of people you are checking in?", timeout = 5000)
+                "We only have $number rooms of this kind free. ")
+        furhat.ask("Would you like to change the number of people you are checking in?", timeout = 5000)
     }
 
     onResponse<No> {
@@ -222,7 +217,7 @@ val SpecificWishes = state(Interaction){
 
 val ExtraWish = state(Interaction){
     onEntry {
-        var random = Random.nextInt(1, 3)
+        val random = Random.nextInt(1, 3)
         if(random == 1 ){
             furhat.ask("Understood. Anything else?")
         }

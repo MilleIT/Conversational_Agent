@@ -24,6 +24,7 @@ val Idle : State = state {
         if (users.count > 0) {
             furhat.attend(users.random)
             goto(Start)
+            //goto(FurtherDetails)
 //            goto(SpecificWishes)
         }
     }

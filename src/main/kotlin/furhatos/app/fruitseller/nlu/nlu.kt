@@ -18,13 +18,6 @@ class RequestOptions: Intent() {
 
 class PeopleList : ListEntity<QuantifiedPeople>()
 
-class UserName(
-    var name : PersonName? = null) : ComplexEnumEntity() {
-    override fun toString(): String {
-        return "@name"
-    }
-}
-
 class QuantifiedPeople(
         var count : Number? = Number(1),
         var person : Person? = null) : ComplexEnumEntity() {
@@ -50,11 +43,7 @@ class Person : EnumEntity(stemming = true, speechRecPhrases = true) {
     }
 }
 
-class Staytype : EnumEntity(stemming = true, speechRecPhrases = true) {
-    override fun getEnum(lang: Language): List<String> {
-        return listOf("day", "week")
-    }
-}
+
 
 //class BuyFruit(var fruits : FruitList? = null) : Intent() {
 //    override fun getExamples(lang: Language): List<String> {
@@ -90,29 +79,48 @@ class QuantifiedStay(
     }
 
     override fun toText(): String {
-        return generate("${count?.value} " + "${stay?.value}")
+        return generate("${count?.value} " + if (count?.value == 1) stay?.value else "${stay?.value}s")
+
     }
 }
-
-
-class GiveLengthStay(var stay: StayList? = null) : Intent() {
-    override fun getExamples(lang: Language): List<String> {
-        return listOf("@stay")
+class Staytype : EnumEntity() {
+    override fun getEnum(lang: Language): List<String> {
+        return listOf("day", "days", "week", "weeks")
     }
 }
-
-class GiveRoomClass() : Intent() {
-    override fun getExamples(lang: Language): List<String> {
+class Roomtype : EnumEntity() {
+    override fun getEnum(lang: Language): List<String> {
         return listOf("suite", "citizen")
     }
 }
 
-class GiveName(var name: PersonName? = null) : Intent(){
+class GiveLengthStay(var stayL : StayList? = null) : Intent() {
     override fun getExamples(lang: Language): List<String> {
-        return listOf("@name")
+        return listOf("@stayL")
     }
 }
 
+class GiveRoomClass(var room : Roomtype? = null) : Intent() {
+    override fun getExamples(lang: Language): List<String> {
+        return listOf("@room")
+    }
+}
+
+class GiveName(var naam: UserName? = null) : Intent(){
+    override fun getExamples(lang: Language): List<String> {
+        return listOf("@naam")
+    }
+}
+
+class UserName(var name : String? = null) : ComplexEnumEntity() {
+    override fun getEnum(lang: Language): List<String> {
+        return listOf("@name")
+    }
+
+    override fun toText(): String {
+        return generate("$name")
+    }
+}
 
 class Details(var name: PersonName? = null, var stay: StayList? = null) : Intent() {
     override fun getExamples(lang: Language): List<String> {
@@ -129,7 +137,7 @@ class Wishes : EnumEntity(stemming = true, speechRecPhrases = true) {
 class WishList : ListEntity<QuantifiedWishes>()
 
 class QuantifiedWishes(
-        val count : furhatos.nlu.common.Number? = Number(1),
+        val count : Number? = Number(1),
         val wish : Wishes? = null) : ComplexEnumEntity() {
 
     override fun getEnum(lang: Language): List<String> {
@@ -156,7 +164,7 @@ class Activities : EnumEntity(stemming = true, speechRecPhrases = true) {
 class ActivitiesList : ListEntity<QuantifiedActivities>()
 
 class QuantifiedActivities(
-        val count : furhatos.nlu.common.Number? = Number(1),
+        val count : Number? = Number(1),
         val activity : Activities? = null) : ComplexEnumEntity() {
 
     override fun getEnum(lang: Language): List<String> {
