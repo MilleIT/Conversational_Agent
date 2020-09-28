@@ -205,9 +205,10 @@ val StarshipOverloaded = state(Interaction) {
 
 val SpecificWishes = state(Interaction){
     onEntry {
-        furhat.ask("Amazing. The data has been entered to your name, @username. Now," +
-            "before asking you about the different activities we offer on board, I would like to " +
-            "ask you if you have any specific wishes for your stay here?")
+        val name : String? = users.current.book.name
+        furhat.say("Amazing. The data has been entered to your name, ${name}")
+        furhat.ask("Now, before asking you about the different activities we offer on board, I would like to " +
+                        "ask you if you have any specific wishes for your stay here?")
     }
     onResponse<No> {
         goto(NoWishes)
