@@ -278,6 +278,12 @@ val NumberOfPeopleChange = state(Interaction) {
         furhat.ask("Wonderful. Please tell me how many guests you would like to check in.")
     }
 
+    onResponse<TellPeople> {
+        val people = it.intent.values[0].toString().toInt()
+        users.current.book.people = Number(people)
+        println("$people " + if (people == 1) "person" else "people" )
+        goto(FurtherDetails)
+    }
 }
 
 val Explaining = state(Interaction) {
