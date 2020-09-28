@@ -137,22 +137,22 @@ val FurtherDetails = state(Interaction) {
     onResponse<GiveRoomClass> {
         println("Yes room")
         users.current.book.roomClass = it.intent.room.toString()
-        goto(Summary) // is only for testing
-        //goto(checkRooms)
+        goto(checkRooms)
     }
 
 }
 
+// for testing only
 val Summary = state(Interaction) {
     onEntry {
-        furhat.ask("would you like me to summarize?")
+        furhat.ask("Would you like me to summarize?")
     }
     onResponse<Yes> {
-        furhat.say ( "so let me summarize")
+        furhat.say ( "So let me summarize")
         val name : String? = users.current.book.name
         val lengthstay : String? = users.current.book.lengthStay
         val roomClass : String? = users.current.book.roomClass
-        println("your name is ${name}, you want to stay ${lengthstay}, and you want rooms of type ${roomClass}")
+        furhat.say("Your name is ${name}, you want to stay for ${lengthstay}, and you want rooms of type ${roomClass}")
         goto(checkRooms)
     }
 
