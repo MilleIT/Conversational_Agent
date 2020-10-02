@@ -6,8 +6,10 @@ import furhatos.flow.kotlin.state
 
 import furhatos.flow.kotlin.*
 import furhatos.nlu.common.Goodbye
+import furhatos.records.Location
 import furhatos.skills.UserManager
 import furhatos.util.Language
+import kotlin.random.Random
 
 val Idle : State = state {
     /*
@@ -67,6 +69,6 @@ val Interaction : State = state {
     }
 
     onUserEnter(instant = true) {
-        furhat.glance(it)
+       furhat.attend(it)
     }
 }
