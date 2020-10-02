@@ -12,10 +12,9 @@ import furhatos.records.Location
 import furhatos.util.Language
 import kotlin.random.Random
 fun Loc(): Location {
-    val x = Random.nextInt(-1,1)
-    val y = Random.nextInt(-1,1)
-    val z = Random.nextInt(-1,1)
-    val location = Location(5.0,0.0,0.0)
+    val x = Random.nextInt(-5,5)
+    val y = Random.nextInt(-1,5)
+    val location = Location(x,y,20)
     return location
 }
 
