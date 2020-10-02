@@ -20,11 +20,8 @@ fun Loc(): Location {
 
 val Start = state(Interaction) {
     onEntry {
-        random(
-            {
-                furhat.attend(Loc())
-                furhat.ask("Hello, how can I help you?") }
-        )
+                furhat.attend(user = users.random)
+                furhat.ask("Hello, how can I help you?")
     }
     onResponse<CheckIn> {
         goto(CheckingIn)
@@ -62,11 +59,12 @@ val Start = state(Interaction) {
 
 val CheckingIn = state(Interaction) {
     onEntry {
-        random(
-            {
                 furhat.attend(Loc())
-                furhat.ask("Great! As the travel is longer than two days on our journey to Vulkan," +
-                    " regulation requires we ask a few questions. Is that okay with you?") })
+                furhat.say("Great! As the travel is longer than two days on our journey to Vulkan," +
+                    " regulation requires we ask a few questions. Is that okay with you?")
+                furhat.attend(user = users.random)
+                furhat.ask("")
+
     }
 
     onResponse<Yes> {
