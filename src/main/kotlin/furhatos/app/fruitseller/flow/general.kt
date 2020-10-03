@@ -8,6 +8,7 @@ import furhatos.flow.kotlin.*
 import furhatos.nlu.common.Goodbye
 import furhatos.skills.UserManager
 import furhatos.util.Language
+import furhatos.records.Location
 
 val Idle : State = state {
     /*
@@ -36,7 +37,8 @@ val Idle : State = state {
     }
 
     onUserEnter {
-        furhat.attend(it)
+        var location = Location(80,80,100); // default gaze = x (looking away)
+        furhat.attend(location)
         goto(Start)
         //goto(FurtherDetails)
     }
@@ -69,4 +71,15 @@ val Interaction : State = state {
     onUserEnter(instant = true) {
         furhat.glance(it)
     }
+
+}
+
+fun Furhat.askGlance(text : String) {
+    attend(Location(80,80,100))
+    glance(users.current, 1000)
+    glance(users.other, 1000)
+    glance(users.current, 1000)
+    glance(users.other, 1000)
+    attend(Location(-80,-80,0))
+    ask(text)
 }

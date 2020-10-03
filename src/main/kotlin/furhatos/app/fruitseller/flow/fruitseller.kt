@@ -2,6 +2,7 @@ package furhatos.app.fruitseller.flow
 
 import furhatos.app.fruitseller.book
 import furhatos.app.fruitseller.nlu.*
+import furhatos.flow.kotlin.furhat
 /*
 import furhatos.app.fruitseller.order
 */
@@ -14,7 +15,7 @@ import kotlin.random.Random
 val Start = state(Interaction) {
     onEntry {
         random(
-            { furhat.ask("Hello, how can I help you?") }
+            { furhat.askGlance("Hello, how can I help you?") }
         )
     }
     onResponse<CheckIn> {
@@ -316,7 +317,6 @@ val NoWishes = state(Interaction) {
         goto(StarshipActivities)
     }
 }
-
 
 /*
 fun OrderReceived(fruits: FruitList) : State = state(Options) {
