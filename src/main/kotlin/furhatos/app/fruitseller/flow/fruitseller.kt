@@ -21,8 +21,8 @@ fun Loc(): Location {
 val LookAround = state(Interaction) {
     onEntry {
         furhat.attend(Loc())
-        delay(Random.nextInt(3000,7000).toLong())
-        furhat.attend(Loc())
+        delay(Random.nextInt(500,3000).toLong())
+        furhat.attend(user = users.current)
     }
 
 }
