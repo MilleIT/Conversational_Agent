@@ -18,11 +18,21 @@ fun Loc(): Location {
     return location
 }
 
+val LookAround = state(Interaction) {
+    onEntry {
+        furhat.attend(Loc())
+        delay(Random.nextInt(3000,7000).toLong())
+        furhat.attend(Loc())
+    }
+
+}
+
 val Start = state(Interaction) {
     onEntry {
-                furhat.attend(user = users.random)
-                furhat.ask("Hello, how can I help you?")
+        furhat.attend(user = users.random)
+        furhat.ask("Hello, how can I help you?")
     }
+
     onResponse<CheckIn> {
         goto(CheckingIn)
         //goto(FurtherDetails)
@@ -59,7 +69,9 @@ val Start = state(Interaction) {
 
 val CheckingIn = state(Interaction) {
     onEntry {
-                furhat.attend(Loc())
+        parallel {
+            goto(LookAround)
+        }
                 furhat.say("Great! As the travel is longer than two days on our journey to Vulkan," +
                     " regulation requires we ask a few questions. Is that okay with you?")
                 furhat.attend(user = users.random)
@@ -78,7 +90,9 @@ val CheckingIn = state(Interaction) {
 
 val NoInfo = state(Interaction) {
     onEntry {
-        furhat.attend(Loc())
+        parallel {
+            goto(LookAround)
+        }
         furhat.say("Without your information I cannot book you in. Are you sure")
         furhat.attend(user = users.random)
         furhat.ask("")
@@ -96,7 +110,9 @@ val NoInfo = state(Interaction) {
 
 val AmountGuests = state(Interaction) {
     onEntry {
-        furhat.attend(Loc())
+        parallel {
+            goto(LookAround)
+        }
         furhat.say("Let's get started then. How many people would you like to check-in?")
         furhat.attend(user = users.random)
         furhat.ask("")
@@ -114,7 +130,9 @@ val AmountGuests = state(Interaction) {
 
 val RandomQuestion = state(Interaction) {
     onEntry {
-        furhat.attend(Loc())
+        parallel {
+            goto(LookAround)
+        }
         furhat.say("Great. By the way, would you like to know about the available amenities in our room?")
         furhat.attend(user = users.random)
         furhat.ask("")
@@ -131,7 +149,9 @@ val RandomQuestion = state(Interaction) {
 
 val RandomQuestion1Yes = state(Interaction) {
     onEntry {
-        furhat.attend(Loc())
+        parallel {
+            goto(LookAround)
+        }
         furhat.ask("You are provided a bed, table, a chair, and a Replicator, which allows you to instantly create " +
                 "any dish you've ever wanted to eat, in the comfort of your own room. ", timeout = 0)
 
@@ -142,12 +162,16 @@ val RandomQuestion1Yes = state(Interaction) {
 
 val FurtherDetails = state(Interaction) {
     onEntry {
-        furhat.attend(Loc())
+        parallel {
+            goto(LookAround)
+        }
         val name = furhat.askFor<PersonName>("Perfect. Now, could you give me your name please?")
         furhat.attend(user = users.random)
 
         users.current.book.name  = name?.value
-        furhat.attend(Loc())
+        parallel {
+            goto(LookAround)
+        }
 
         furhat.say("Thank you. How long do you intend to stay on" +
                 "Starship Enterprise, and would you like to stay in our Suite-class rooms" +
@@ -173,7 +197,9 @@ val FurtherDetails = state(Interaction) {
 
 val Summary = state(Interaction) {
     onEntry {
-        furhat.attend(Loc())
+        parallel {
+            goto(LookAround)
+        }
         furhat.say("would you like me to summarize?")
         furhat.attend(user = users.random)
         furhat.ask("")
@@ -194,7 +220,9 @@ val Summary = state(Interaction) {
 
 val checkRooms : State = state(Interaction){
     onEntry {
-        furhat.attend(Loc())
+        parallel {
+            goto(LookAround)
+        }
 
         val people : Int? = users.current.book.people?.value
         var SuitesNeeded : Int? = 0
@@ -219,7 +247,9 @@ val checkRooms : State = state(Interaction){
 
 val StarshipOverloaded = state(Interaction) {
     onEntry {
-        furhat.attend(Loc())
+        parallel {
+            goto(LookAround)
+        }
 
         val number : Number? = if (users.current.book.roomClass == "suite") users.current.book.suiteRooms else users.current.book.citiRooms
         furhat.say("Unfortunately there are no rooms left of this kind. " +
@@ -241,7 +271,9 @@ val StarshipOverloaded = state(Interaction) {
 
 val SpecificWishes = state(Interaction){
     onEntry {
-        furhat.attend(Loc())
+        parallel {
+            goto(LookAround)
+        }
 
         val name : String? = users.current.book.name
         furhat.say("Amazing. The data has been entered to your name, ${name}")
@@ -259,7 +291,9 @@ val SpecificWishes = state(Interaction){
 
 val ExtraWish = state(Interaction){
     onEntry {
-        furhat.attend(Loc())
+        parallel {
+            goto(LookAround)
+        }
 
         val random = Random.nextInt(1, 3)
         if(random == 1 ){
@@ -289,7 +323,9 @@ val ExtraWish = state(Interaction){
 
 val StarshipActivities = state(Interaction){
     onEntry {
-        furhat.attend(Loc())
+        parallel {
+            goto(LookAround)
+        }
 
         furhat.say("On Starship Enterprise we offer numerous simulated activities, namely:" +
                 "Skiing, Tennis, Badminton, and Zombie Survival. Please tell me which ones of" +
@@ -308,7 +344,9 @@ val StarshipActivities = state(Interaction){
 
 val endState = state(Interaction){
     onEntry {
-        furhat.attend(Loc())
+        parallel {
+            goto(LookAround)
+        }
 
         furhat.say("Understood. You have now successfully checked in. You will soon be teleported to your" +
                 "room, and your luggage will be delivered by our staff.")
@@ -320,7 +358,9 @@ val endState = state(Interaction){
 
 val CheckinCancel = state(Interaction){
     onEntry {
-        furhat.attend(Loc())
+        parallel {
+            goto(LookAround)
+        }
 
         furhat.say("Alright then, please tell me if you'd like to start over." +
                     " Otherwise, I wish you a good day.")
@@ -334,7 +374,9 @@ val CheckinCancel = state(Interaction){
 
 val NumberOfPeopleChange = state(Interaction) {
     onEntry {
-        furhat.attend(Loc())
+        parallel {
+            goto(LookAround)
+        }
 
         furhat.say("Wonderful. Please tell me how many guests you would like to check in.")
         furhat.attend(user = users.random)
@@ -351,7 +393,9 @@ val NumberOfPeopleChange = state(Interaction) {
 
 val Explaining = state(Interaction) {
     onEntry {
-        furhat.attend(Loc())
+        parallel {
+            goto(LookAround)
+        }
 
         random(
                 {
@@ -374,7 +418,9 @@ val Explaining = state(Interaction) {
 
 val EndWishes = state(Interaction) {
     onEntry {
-        furhat.attend(Loc())
+        parallel {
+            goto(LookAround)
+        }
 
         furhat.say("All right, your demands have been noted and will be read by the crew. Let's move on then.")
         goto(StarshipActivities)
@@ -383,7 +429,9 @@ val EndWishes = state(Interaction) {
 
 val NoWishes = state(Interaction) {
     onEntry {
-        furhat.attend(Loc())
+        parallel {
+            goto(LookAround)
+        }
 
         furhat.say("Alright, then let's move on.")
         goto(StarshipActivities)
