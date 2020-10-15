@@ -122,7 +122,8 @@ val LookForCause = state(Interaction) {
         furhat.say("Alright then, please give me a moment to find out what happened exactly."
         )
         furhat.attend(user = users.random)
-        furhat.ask("") // SPLITSING NAAR ALLE ONDERWERPEN
+        //furhat.ask("") // TODO SPLITSING NAAR ALLE ONDERWERPEN
+        goto(NoRefund)
 
     }
 }
@@ -139,6 +140,35 @@ val TryOrderAgain = state(Interaction) {
 
 }
 
+val NoRefund = state(Interaction) {
+    onEntry {
+        // TODO look around or attend
+        val random = Random.nextInt(1, 3)
+        if (random == 1) {
+            furhat.say("The refund should indeed have taken place, as the product was already returned to us x days ago. I apologize for this delay and make sure we send you the refund within 24 hours.")
+            goto(AnythingElse)
+        } else if (random == 2) {
+            furhat.say("It seems like the product you returned has only just arrived today. The payment process has been set in motion and you will be refunded within 24 hours.")
+            goto(AnythingElse)
+        } else if (random == 3) {
+            var overFiveDays = furhat.askYN("It looks like the product you returned has not arrived at our storage center yet. Did you mail it more than five days ago?")
+            if (overFiveDays!!) {
+                // TODO
+            } else {
+                // TODO
+            }
+        }
+    }
+
+
+}
+
+val AnythingElse = state(Interaction) {
+    onEntry {
+        furhat.ask("Is there anything else I can do for you?")
+    }
+
+}
 
 
 
@@ -493,11 +523,11 @@ val Explaining = state(Interaction) {
     }
 
     onResponse<Yes> {
-        goto(CheckingIn)
+        //goto(CheckingIn) TODO dit gaf uit het niets een error
     }
-    onResponse<CheckIn> {
-        goto(CheckingIn)
-    }
+    //onResponse<CheckIn> {
+        //goto(CheckingIn) TODO dit gaf uit het niets een error
+    //}
 }
 
 val EndWishes = state(Interaction) {
