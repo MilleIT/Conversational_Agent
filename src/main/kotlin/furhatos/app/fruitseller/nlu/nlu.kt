@@ -51,17 +51,41 @@ class Person : EnumEntity(stemming = true, speechRecPhrases = true) {
 //    }
 //}
 
-class CheckIn() : Intent() {
+class WrongPackage() : Intent() {
     override fun getExamples(lang: Language): List<String> {
-        return listOf("I would like to check in")
+        return listOf("I got the wrong package")
     }
 }
 
-class Confusion() : Intent() {
+class NoPackage() : Intent() {
     override fun getExamples(lang: Language): List<String> {
-        return listOf("Who are you?", "Where am I?", "What is this?", "What")
+        return listOf("My package didn't arrive")
     }
 }
+
+class NoRefund() : Intent() {
+    override fun getExamples(lang: Language): List<String> {
+        return listOf("I didn't receive my refund")
+    }
+}
+
+class OrderAndName() : Intent() {
+    override fun getExamples(lang: Language): List<String> {
+        return listOf("I didn't receive my refund") //MOET VARIABLE KUNNEN ACCEPTEN!
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 class TellPeople(var people: PeopleList? = null) : Intent() {
     override fun getExamples(lang: Language): List<String> {

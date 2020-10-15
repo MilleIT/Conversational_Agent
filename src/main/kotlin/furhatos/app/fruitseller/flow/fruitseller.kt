@@ -10,6 +10,7 @@ import furhatos.nlu.common.*
 import furhatos.nlu.common.Number
 import furhatos.records.Location
 import furhatos.util.Language
+import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 fun Loc(): Location {
     val x = Random.nextInt(-5,5)
@@ -30,17 +31,22 @@ val LookAround = state(Interaction) {
 val Start = state(Interaction) {
     onEntry {
         furhat.attend(user = users.random)
-        furhat.ask("Hello, how can I help you?")
+        furhat.ask("Hello welcome to the live support of Bol.com. " +
+                "My name is Furhat and I will be assisting you today. " +
+                "Could you tell me what problem you are experiencing? " +
+                "I can help when a package is late or lost, a wrong package is delivered, or no you have received no refund.")
     }
 
-    onResponse<CheckIn> {
-        goto(CheckingIn)
-        //goto(FurtherDetails)
-        // temp to get to wish state
-//        goto(specificWishes)
+    onResponse<WrongPackage> {
+        //SAVE THAT PACKAGE IS WRONG
+        goto(Problem)
+
     }
-    onResponse<Confusion> {
-        goto(Explaining)
+    onResponse<NoPackage> {
+        goto(Problem)
+    }
+    onResponse<NoRefund> {
+        goto(Problem)
     }
 }
 /*val Options = state(Interaction) {
@@ -67,26 +73,104 @@ val Start = state(Interaction) {
     }
 }*/
 
-val CheckingIn = state(Interaction) {
+val Problem = state(Interaction) {
     onEntry {
         parallel {
             goto(LookAround)
         }
-                furhat.say("Great! As the travel is longer than two days on our journey to Vulkan," +
-                    " regulation requires we ask a few questions. Is that okay with you?")
+                furhat.say("I'm sorry that you @problem" +
+                        "Can I have your order number and last name?"
+        )
                 furhat.attend(user = users.random)
                 furhat.ask("")
 
     }
 
-    onResponse<Yes> {
-        goto(AmountGuests)
+    onResponse<OrderAndName> {
+        //Store Order and Last name
+        goto(LookUpOrder)
     }
 
     onResponse<No> {
         goto(NoInfo)
     }
 }
+
+val LookUpOrder = state(Interaction) {
+    onEntry {
+        furhat.attend(user = users.random)
+        furhat.ask("Thank you, I'll look up your order straight away!")
+        furhat.attend(Loc())
+        TimeUnit.SECONDS.sleep(2)
+        furhat.ask("I can see here this is about order @Order, is that right?") //misschien onnodige vraag
+    }
+
+    onResponse<No> {
+        //SAVE THAT PACKAGE IS WRONG
+        goto(TryOrderAgain)
+    }
+    onResponse<Yes> {
+        goto(LookForCause)
+    }
+}
+
+val LookForCause = state(Interaction) {
+    onEntry {
+        parallel {
+            goto(LookAround)
+        }
+        furhat.say("Alright then, please give me a moment to find out what happened exactly."
+        )
+        furhat.attend(user = users.random)
+        furhat.ask("") // SPLITSING NAAR ALLE ONDERWERPEN
+
+    }
+}
+
+val TryOrderAgain = state(Interaction) {
+    onEntry {
+        furhat.attend(user = users.random)
+        furhat.ask("Let's try this again then. Can you repeat the order number? It can be found in the confirmation email of your order.")
+        furhat.attend(Loc())
+        TimeUnit.SECONDS.sleep(2)
+        furhat.say { "Thank you for your patience, I have found your order" } // Moet hier order variable storen
+        goto(LookForCause)
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 val NoInfo = state(Interaction) {
     onEntry {
