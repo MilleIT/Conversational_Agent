@@ -13,6 +13,6 @@ class UserData (
         var problem : String? = null
 )
 
-/*
+
 val User.book : UserData
-    get() = data.getOrPut(BookingData::class.qualifiedName, BookingData())*/
+    get() = data.getOrPut(UserData::class.qualifiedName, UserData())
