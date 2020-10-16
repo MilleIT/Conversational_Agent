@@ -6,6 +6,7 @@ import furhatos.app.fruitseller.nlu.*
 import furhatos.app.fruitseller.order
 */
 import furhatos.flow.kotlin.*
+import furhatos.gestures.Gestures
 import furhatos.nlu.common.*
 import furhatos.nlu.common.Number
 import furhatos.records.Location
@@ -31,19 +32,20 @@ val LookAround = state(Interaction) {
 val Start = state(Interaction) {
     onEntry {
         furhat.attend(user = users.random)
-        val problem = furhat.ask("Hello welcome to the live support of Bol.com. " +
-                "My name is Furhat and I will be assisting you today. " +
+        val problem = furhat.ask("Hello, I'm Furhat and I will be assisting you today. " +
                 "Could you tell me what problem you are experiencing? " +
                 "I can help when a package is late or lost, a wrong package is delivered, or refund is received.")
         if (problem == "I got the wrong package") {
             users.current.book.problem  = "got the wrong package"
-
         }
-        if (problem == "My package didn't arrive") {
+        else if (problem == "My package didn't arrive") {
             users.current.book.problem  = "didn't receive package"
         }
-        if (problem == "I didn't receive my refund") {
+        else if (problem == "I didn't receive my refund") {
             users.current.book.problem  = "didn't receive refund"
+        }
+        else { // TODO dit werkt nog niet nice
+            furhat.say("Sorry I can only help you with the three problems mentioned before. Please call 030 310 49 99 for any other questions.")
         }
         goto(NoRefund)
     }
@@ -89,12 +91,34 @@ val Problem = state(Interaction) {
         parallel {
             goto(LookAround)
         }
-                furhat.say("I'm sorry that you " + users.current.book.problem +
-                        "Can I have your order number and last name?"
+        furhat.ask("I'm sorry that you " + users.current.book.problem +
+                "Do you want to tell me what happened?", endSil = 5000)
+        furhat.attend(user = users.random)
+    }
+    onInterimResponse(endSil = 1000) {
+        random (
+                { furhat.say("Okay", async = true) },
+                { furhat.say("Hmm", async = true) },
+                { furhat.say("I see", async = true) },
+                { furhat.say("Right", async = true) },
+                { furhat.gesture(Gestures.Nod) }
         )
-                furhat.attend(user = users.random)
-                furhat.ask("")
+    }
+    onResponse<No> {
+        furhat.say("That's alright, let's focus on fixing this issue immediately.")
+        goto(OrderAndName)
+    }
+    onResponse {
+        furhat.say("Hmm I see. This is indeed not the service we would have wanted to " +
+                "provide you with. I'm sorry this happened. In order to make sure I have all " +
+                "necessary information to fix this as soon as possible I'll ask you a couple of questions.")
+        goto(OrderAndName)
+    }
+}
 
+val OrderAndName = state(Interaction) {
+    onEntry {
+        furhat.ask("Can I have your order number and last name?")
     }
 
     onResponse<OrderAndName> {
@@ -103,14 +127,14 @@ val Problem = state(Interaction) {
     }
 
     onResponse<No> {
-       // goto(NoInfo)
+        // goto(NoInfo) TODO
     }
 }
 
 val LookUpOrder = state(Interaction) {
     onEntry {
         furhat.attend(user = users.random)
-        furhat.say("Thank you, I'll look up your order straight away!")
+        furhat.say("Thank you, I'll look up your order straight away.")
         furhat.attend(Loc())
         TimeUnit.SECONDS.sleep(2)
         furhat.ask("I can see here this is about order @Order, is that right?") //misschien onnodige vraag
@@ -130,7 +154,7 @@ val LookForCause = state(Interaction) {
         parallel {
             goto(LookAround)
         }
-        furhat.say("Alright then, now please give me a moment to find out what happened exactly.")
+        furhat.say("Alright then, now please give me a moment to retrieve the relevant data we have on this.")
         TimeUnit.SECONDS.sleep(3)
         furhat.attend(user = users.random)
         //furhat.ask("") // TODO SPLITSING NAAR ALLE ONDERWERPEN
