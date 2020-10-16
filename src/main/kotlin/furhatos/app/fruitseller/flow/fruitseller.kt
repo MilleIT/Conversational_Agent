@@ -155,6 +155,40 @@ val FoundOrder = state(Interaction) {
     }
 }
 
+val WrongPackage = state(Interaction) {
+    onEntry {
+        furhat.ask {
+            "It looks like something went wrong with the processing of your order," +
+                    " could you tell me what you intended to order? " +
+                    "Please note that the only items we sell are laptops, Tv's, Playstations and headphones." }
+        }
+
+    onResponse<IntendedOrder> {
+        // if intended order == order ->goto(sameOrder)
+        goto(NewOrder)
+    }
+    }
+
+val NewOrder = state(Interaction) {
+    onEntry {
+        furhat.ask { "Ok, I made a new order for you for a @newOrder"
+            "I've also added free priority shipping to compensate for the receivement of a wrong package." +
+                    " When we deliver the new order we'll take the wrongly received @Order with us."
+            "Could you tell me which day this week you'll be at home after 5 pm?" }
+    }
+
+    onResponse<DaysInWeek> {
+        furhat.say { "Excellent, I have send a confirmation mail to the same email as your previous order." +
+                " We'll see you on @Day" }
+    }
+
+    onResponse<NoDay> {
+        furhat.say { "That's ok, since free retour lasts 30 days there is still time left to return @Order" +
+                "You can either make a return appointment at our website or keep the item." +
+                " Please note that if you keep the item, we can not offer a refund." }
+    }
+}
+
 val NoRefund = state(Interaction) {
     onEntry {
         // TODO look around or attend

@@ -51,6 +51,24 @@ class Person : EnumEntity(stemming = true, speechRecPhrases = true) {
 //    }
 //}
 
+class IntendedOrder() : Intent() {
+    override fun getExamples(lang: Language): List<String> {
+        return listOf("Headphone", "Laptop", "TV", "Playstation")
+    }
+}
+
+class DaysInWeek() : Intent() {
+    override fun getExamples(lang: Language): List<String> {
+        return listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+    }
+}
+
+class NoDay() : Intent() {
+    override fun getExamples(lang: Language): List<String> {
+        return listOf("No day")
+    }
+}
+
 class WrongPackage() : Intent() {
     override fun getExamples(lang: Language): List<String> {
         return listOf("I got the wrong package")
