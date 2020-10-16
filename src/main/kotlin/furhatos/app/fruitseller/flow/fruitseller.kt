@@ -282,6 +282,40 @@ val AnythingElse = state(Interaction) {
         furhat.ask("Is there anything else I can do for you?")
     }
 
+    onResponse<Yes> {
+        furhat.say("I think that one of my collegues can be of better help, I'll put you through.")
+    }
+
+    onResponse<No> {
+        goto(AskForFeedback)
+    }
+}
+
+val AskForFeedback = state(Interaction) {
+    onEntry {
+        var givesFeedback = furhat.askYN("As you know I'm a bot that is ever improving. Would you be willing to give me " +
+                "some tips so that I can provide you with a better service in the future?")
+        if(givesFeedback!!) {
+            goto(FeedbackRating)
+        } else {
+            furhat.say("That's alright. I wish you a nice day!")
+        }
+    }
+}
+
+val FeedbackRating = state(Interaction) {
+    onEntry {
+        furhat.ask("That's great! Overall, how would you rate our previous conversation? Bad, ok, or good?)
+    }
+    onResponse<Bad> {
+        // TODO
+    }
+    onResponse<Ok> {
+        // TODO
+    }
+    onResponse<Good> {
+        // TODO
+    }
 }
 
 

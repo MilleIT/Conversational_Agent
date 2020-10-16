@@ -93,6 +93,24 @@ class OrderAndName() : Intent() {
     }
 }
 
+class Bad() : Intent() {
+    override fun getExamples(lang: Language): List<String> {
+        return listOf("Bad", "Poor", "Disappointing", "Unsatisfactory", "Hopeless", "Unacceptable", "Shit", "Crap", "Sucked", "Useless", "Terrible", "Awful", "Miserable")
+    }
+}
+
+class Ok() : Intent() {
+    override fun getExamples(lang: Language): List<String> {
+        return listOf("Ok", "Alright", "Not too bad", "Fine", "Average", "Okay", "Standard", "Fair")
+    }
+}
+
+class Good() : Intent() {
+    override fun getExamples(lang: Language): List<String> {
+        return listOf("Good", "Very good", "Nice", "Very nice", "Fantastic", "Excellent", "Super", "Glorious", "Impressive", "Outstanding", "Remarkable")
+    }
+}
+
 
 
 
