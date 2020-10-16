@@ -30,12 +30,22 @@ val LookAround = state(Interaction) {
 
 val Start = state(Interaction) {
     onEntry {
-        goto(NoRefund)
         furhat.attend(user = users.random)
-        furhat.ask("Hello welcome to the live support of Bol.com. " +
+        val problem = furhat.ask("Hello welcome to the live support of Bol.com. " +
                 "My name is Furhat and I will be assisting you today. " +
                 "Could you tell me what problem you are experiencing? " +
                 "I can help when a package is late or lost, a wrong package is delivered, or refund is received.")
+        if (problem == "I got the wrong package") {
+            users.current.book.problem  = "got the wrong package"
+
+        }
+        if (problem == "My package didn't arrive") {
+            users.current.book.problem  = "didn't receive package"
+        }
+        if (problem == "I didn't receive my refund") {
+            users.current.book.problem  = "didn't receive refund"
+        }
+        goto(NoRefund)
     }
 
     onResponse<WrongPackage> {
@@ -79,7 +89,7 @@ val Problem = state(Interaction) {
         parallel {
             goto(LookAround)
         }
-                furhat.say("I'm sorry that you @problem" +
+                furhat.say("I'm sorry that you " + users.current.book.problem +
                         "Can I have your order number and last name?"
         )
                 furhat.attend(user = users.random)
@@ -93,7 +103,7 @@ val Problem = state(Interaction) {
     }
 
     onResponse<No> {
-        goto(NoInfo)
+       // goto(NoInfo)
     }
 }
 
@@ -282,7 +292,7 @@ val AnythingElse = state(Interaction) {
 
 
 
-val NoInfo = state(Interaction) {
+/*val NoInfo = state(Interaction) {
     onEntry {
         parallel {
             goto(LookAround)
@@ -630,7 +640,7 @@ val NoWishes = state(Interaction) {
         furhat.say("Alright, then let's move on.")
         goto(StarshipActivities)
     }
-}
+}*/
 
 
 /*
