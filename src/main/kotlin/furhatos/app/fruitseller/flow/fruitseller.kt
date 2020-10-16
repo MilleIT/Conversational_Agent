@@ -30,7 +30,7 @@ val LookAround = state(Interaction) {
 
 val Start = state(Interaction) {
     onEntry {
-        goto(TryOrderAgain)
+        goto(NoRefund)
         furhat.attend(user = users.random)
         furhat.ask("Hello welcome to the live support of Bol.com. " +
                 "My name is Furhat and I will be assisting you today. " +
@@ -158,27 +158,56 @@ val FoundOrder = state(Interaction) {
 val NoRefund = state(Interaction) {
     onEntry {
         // TODO look around or attend
-        random (
-            {
-                furhat.say("The refund should indeed have taken place, as the product was already returned to us 2 days ago. I apologize for this delay and make sure we send you the refund within 24 hours.")
-                goto(AnythingElse)
-            },
-            {
-                furhat.say("It seems like the product you returned has only just arrived today. The payment process has been set in motion and you will be refunded within 24 hours.")
-                goto(AnythingElse)
-            },
-            {
-                val overFiveDays = furhat.askYN("It looks like the product you returned has not arrived at our storage center yet. Did you mail it more than five days ago?")
-                if (overFiveDays!!) {
-                    // TODO
-                } else {
-                    // TODO
-                }
+        val random = Random.nextInt(1, 3)
+        if(random == 1 ){
+            furhat.say("The refund should indeed have taken place, as the product was already returned to us 2 days ago. I apologize for this delay and make sure we send you the refund within 24 hours.")
+            goto(AnythingElse)
+        }
+        else if(random == 2) {
+            furhat.say("It seems like the product you returned has only just arrived today. The payment process has been set in motion and you will be refunded within 24 hours.")
+            goto(AnythingElse)
+        }
+        else if(random == 3) {
+            val overFiveDays = furhat.askYN("It looks like the product you returned has not arrived at our storage center yet. Did you mail it more than five days ago?")
+            if (overFiveDays!!) {
+                goto(RefundNotFixed)
+            } else {
+                goto(RefundFixed)
             }
-        )
+        }
     }
 }
 
+val RefundNotFixed = state(Interaction) {
+    onEntry {
+        val hasCopy = furhat.askYN("Something must have gone wrong with the delivery company. Do you still have the proof of shipment?")
+        if (hasCopy!!) {
+            furhat.say("That's good to hear! If you could send an email to helpdesk@bol.com with a picture or scan of the proof of shipment, it will all be sorted out. We'll reply to you within 6 hours and then the refund will be processed within 24 hours. I apologize for the delay and extra effort this requested from you.")
+        } else {
+            furhat.say("I'm sorry to say that we cannot refund you at this point but there might be a way to fix this. If you contact the delivery company, they could find out what happened. Once the package has arrived, I'll make sure you are refunded within 24 hours.")
+        }
+        goto(AnythingElse)
+    }
+}
+
+val RefundFixed = state(Interaction) {
+    onEntry {
+        furhat.ask("It can take up to five working days for a package to arrive. I can notify you if your package has arrived or if it still hasn't after five days. Then we'll find out what happened and make sure you receive the refund. Would you like to be contacted via email, text message, or not at all?")
+    }
+
+    onResponse<Yes> { // TODO change to email or text message
+        furhat.say("Alright, noted. We'll be in touch soon.")
+        furhat.say("I sincerely hope the package will just arrive in no time and you do not need to put in any more effort than you already have.")
+        goto(AnythingElse)
+    }
+
+    onResponse<No> { // TODO also include not at all
+        furhat.say("Sure, no problem. You can always contact me via this channel 24/7.")
+        furhat.say("I sincerely hope the package will just arrive in no time and you do not need to put in any more effort than you already have.")
+        goto(AnythingElse)
+    }
+
+}
 
 val AnythingElse = state(Interaction) {
     onEntry {
