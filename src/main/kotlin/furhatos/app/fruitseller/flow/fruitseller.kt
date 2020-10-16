@@ -30,15 +30,16 @@ val LookAround = state(Interaction) {
 
 val Start = state(Interaction) {
     onEntry {
+        goto(TryOrderAgain)
         furhat.attend(user = users.random)
         furhat.ask("Hello welcome to the live support of Bol.com. " +
                 "My name is Furhat and I will be assisting you today. " +
                 "Could you tell me what problem you are experiencing? " +
-                "I can help when a package is late or lost, a wrong package is delivered, or no you have received no refund.")
+                "I can help when a package is late or lost, a wrong package is delivered, or refund is received.")
     }
 
     onResponse<WrongPackage> {
-        //SAVE THAT PACKAGE IS WRONG
+        // TODO SAVE THAT PACKAGE IS WRONG
         goto(Problem)
 
     }
@@ -99,7 +100,7 @@ val Problem = state(Interaction) {
 val LookUpOrder = state(Interaction) {
     onEntry {
         furhat.attend(user = users.random)
-        furhat.ask("Thank you, I'll look up your order straight away!")
+        furhat.say("Thank you, I'll look up your order straight away!")
         furhat.attend(Loc())
         TimeUnit.SECONDS.sleep(2)
         furhat.ask("I can see here this is about order @Order, is that right?") //misschien onnodige vraag
@@ -119,8 +120,8 @@ val LookForCause = state(Interaction) {
         parallel {
             goto(LookAround)
         }
-        furhat.say("Alright then, please give me a moment to find out what happened exactly."
-        )
+        furhat.say("Alright then, now please give me a moment to find out what happened exactly.")
+        TimeUnit.SECONDS.sleep(3)
         furhat.attend(user = users.random)
         //furhat.ask("") // TODO SPLITSING NAAR ALLE ONDERWERPEN
         goto(NoRefund)
@@ -133,35 +134,51 @@ val TryOrderAgain = state(Interaction) {
         furhat.attend(user = users.random)
         furhat.ask("Let's try this again then. Can you repeat the order number? It can be found in the confirmation email of your order.")
         furhat.attend(Loc())
-        TimeUnit.SECONDS.sleep(2)
-        furhat.say { "Thank you for your patience, I have found your order" } // Moet hier order variable storen
-        goto(LookForCause)
     }
 
+    onResponse<No> { // TODO not an order number
+        reentry()
+    }
+    onResponse<Yes> { // TODO change to order number
+        goto(FoundOrder)
+    }
+
+}
+
+val FoundOrder = state(Interaction) {
+    onEntry {
+        furhat.say ( "Ok, let me check." )
+        TimeUnit.SECONDS.sleep(3)
+        furhat.say ( "Thank you for your patience, I have found your order." ) // Moet hier order variable storen
+        TimeUnit.SECONDS.sleep(1)
+        goto(LookForCause)
+    }
 }
 
 val NoRefund = state(Interaction) {
     onEntry {
         // TODO look around or attend
-        val random = Random.nextInt(1, 3)
-        if (random == 1) {
-            furhat.say("The refund should indeed have taken place, as the product was already returned to us x days ago. I apologize for this delay and make sure we send you the refund within 24 hours.")
-            goto(AnythingElse)
-        } else if (random == 2) {
-            furhat.say("It seems like the product you returned has only just arrived today. The payment process has been set in motion and you will be refunded within 24 hours.")
-            goto(AnythingElse)
-        } else if (random == 3) {
-            var overFiveDays = furhat.askYN("It looks like the product you returned has not arrived at our storage center yet. Did you mail it more than five days ago?")
-            if (overFiveDays!!) {
-                // TODO
-            } else {
-                // TODO
+        random (
+            {
+                furhat.say("The refund should indeed have taken place, as the product was already returned to us 2 days ago. I apologize for this delay and make sure we send you the refund within 24 hours.")
+                goto(AnythingElse)
+            },
+            {
+                furhat.say("It seems like the product you returned has only just arrived today. The payment process has been set in motion and you will be refunded within 24 hours.")
+                goto(AnythingElse)
+            },
+            {
+                val overFiveDays = furhat.askYN("It looks like the product you returned has not arrived at our storage center yet. Did you mail it more than five days ago?")
+                if (overFiveDays!!) {
+                    // TODO
+                } else {
+                    // TODO
+                }
             }
-        }
+        )
     }
-
-
 }
+
 
 val AnythingElse = state(Interaction) {
     onEntry {
