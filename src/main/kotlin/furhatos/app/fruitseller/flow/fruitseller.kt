@@ -11,6 +11,7 @@ import furhatos.nlu.common.*
 import furhatos.nlu.common.Number
 import furhatos.records.Location
 import furhatos.util.Language
+import java.net.Inet4Address
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 fun Loc(): Location {
@@ -189,6 +190,72 @@ val FoundOrder = state(Interaction) {
     }
 }
 
+val OnItsWay = state(Interaction){
+    onEntry {
+        furhat.ask("It looks like your package is on it's way and will be delivered" +
+                " within two days. We are sorry for the delay. As a compensation I will send you a 20% discount coupon for your next order.")
+    }
+    onResponse<TooLate> {
+        goto(ReturnPackage)
+    }
+    onResponse<Confirm> {
+        goto(AnythingElse)
+    }
+}
+
+val ReturnPackage = state(Interaction){
+    onEntry {
+        furhat.say { "I am sorry to hear that. I send you a coupon you can use to have the product" +
+                " returned and picked up from your home for free. On our website you can choose when " +
+                "you would like the product to be picked up." }
+        goto(AnythingElse)
+    }
+}
+
+val NotSentYet = state(Interaction) {
+    onEntry {
+        furhat.ask("It looks like something went wrong with the processing of your order. " +
+                "The product has not been send to you, we are very sorry for the inconvenience. " +
+                "Would you still like to receive the product or would you like to cancel your order? ")
+    }
+    onResponse<Cancel> {
+        goto(CancelOrder)
+    }
+    onResponse<StillReceive> {
+        goto(ContinueOrder)
+    }
+}
+
+val ContinueOrder = state(Interaction) {
+    onEntry {
+        furhat.ask("Your order has been placed now. You will receive a comfirmation e-mail. Also we will send" +
+                " it express, so you can expect your package to arrive tomorrow.")
+    }
+    onResponse<NotHome> {
+        goto(DeliveryDate)
+    }
+}
+
+
+val DeliveryDate = state(Interaction) {
+    onEntry {
+        furhat.say { "That is unfortunate. In the e-mail you have received you can select another delivery" +
+                " date or choose to have your package delivered to a pick-up point." }
+        goto(AnythingElse)
+    }
+}
+
+val CancelOrder = state(Interaction) {
+    onEntry {
+        furhat.say { "I will cancel the order right now and will send you a refund straight away. You can" +
+                " expect the money to be back on your acount within 3 days. Also I will send you a 20% " +
+                "discount coupon for your next order, as a compromise for the inconvenience we caused you." }
+        goto(AnythingElse)
+
+    }
+}
+
+
 val WrongPackage = state(Interaction) {
     onEntry {
         furhat.ask {
@@ -305,20 +372,58 @@ val AskForFeedback = state(Interaction) {
 
 val FeedbackRating = state(Interaction) {
     onEntry {
-        furhat.ask("That's great! Overall, how would you rate our previous conversation? Bad, ok, or good?)
+        furhat.ask("That's great! Overall, how would you rate our previous conversation? Bad, ok, or good?")
     }
     onResponse<Bad> {
-        // TODO
+        furhat.ask("That's sad to hear, but I'm glad you want to give me some tips. What would you like to see differently next time?")
+        goto(Apologies)
     }
     onResponse<Ok> {
-        // TODO
+        furhat.ask { "Ah I see, what could I have done differently so that you would have rated the conversation as good?"  }
+        goto(Apologies)
     }
     onResponse<Good> {
-        // TODO
+        furhat.ask { "That's nice to hear. What did you like most about it?" }
+        goto(BetterNextTime)
     }
 }
 
+val BetterNextTime = state(Interaction){
+    onEntry {
+        furhat.ask{"Thank you! Was there also anything that I could do better next time?"}
+        goto(TakeInAccount)
+    }
+}
 
+val Apologies = state(Interaction) {
+    onEntry {
+        val random = Random.nextInt(1, 3)
+        if (random == 1) {
+            furhat.ask("I am sorry to hear that.")
+        } else if (random == 2) {
+            furhat.say("That is very inconvenient")
+        } else if (random == 3) {
+            furhat.say("Our apologies.")
+        }
+        goto(AgreeAndPositive)
+    }
+}
+
+val AgreeAndPositive = state(Interaction){
+    onEntry {
+        furhat.say("I completely agree. Thank you for pointing that out.")
+        furhat.ask("Was there also something that you liked about our conversation?")
+        // TODO response when speaker is done
+        goto(TakeInAccount)
+    }
+}
+
+val TakeInAccount = state(Interaction){
+    onEntry {
+        furhat.say { "Thank you for the feedback. I will take everything into account and learn from this." }
+        furhat.say { "I wish you a very nice day!" }
+    }
+}
 
 
 
