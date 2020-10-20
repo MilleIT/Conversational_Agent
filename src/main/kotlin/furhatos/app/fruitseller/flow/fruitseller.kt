@@ -32,6 +32,9 @@ val LookAround = state(Interaction) {
 
 val Start = state(Interaction) {
     onEntry {
+        parallel {
+            goto(LookAround)
+        }
         furhat.attend(user = users.random)
         val problem = furhat.ask("Hello, I'm Furhat and I will be assisting you today. " +
                 "Could you tell me what problem you are experiencing? " +
@@ -193,7 +196,7 @@ val FoundOrder = state(Interaction) {
 val OnItsWay = state(Interaction){
     onEntry {
         furhat.ask("It looks like your package is on it's way and will be delivered" +
-                " within two days. We are sorry for the delay. As a compensation I will send you a 20% discount coupon for your next order.")
+                " within two days. We are sorry for the delay. As compensation I will send you a 20% discount coupon for your next order.")
     }
     onResponse<TooLate> {
         goto(ReturnPackage)
@@ -292,24 +295,21 @@ val NewOrder = state(Interaction) {
 
 val NoRefund = state(Interaction) {
     onEntry {
-        // TODO look around or attend
-        val random = Random.nextInt(1, 3)
-        if(random == 1 ){
-            furhat.say("The refund should indeed have taken place, as the product was already returned to us 2 days ago. I apologize for this delay and make sure we send you the refund within 24 hours.")
-            goto(AnythingElse)
+        parallel {
+            goto(LookAround)
         }
-        else if(random == 2) {
-            furhat.say("It seems like the product you returned has only just arrived today. The payment process has been set in motion and you will be refunded within 24 hours.")
-            goto(AnythingElse)
-        }
-        else if(random == 3) {
-            val overFiveDays = furhat.askYN("It looks like the product you returned has not arrived at our storage center yet. Did you mail it more than five days ago?")
-            if (overFiveDays!!) {
-                goto(RefundNotFixed)
-            } else {
-                goto(RefundFixed)
-            }
-        }
+        random (
+                { furhat.say("The refund should indeed have taken place, as the product was already returned to us 2 days ago. I apologize for this delay and make sure we send you the refund within 24 hours.")
+                    goto(AnythingElse) },
+                {furhat.say("It seems like the product you returned has only just arrived today. The payment process has been set in motion and you will be refunded within 24 hours.")
+                    goto(AnythingElse) },
+                {val overFiveDays = furhat.askYN("It looks like the product you returned has not arrived at our storage center yet. Did you mail it more than five days ago?")
+                    if (overFiveDays!!) {
+                        goto(RefundNotFixed)
+                    } else {
+                        goto(RefundFixed)
+                    } }
+        )
     }
 }
 
@@ -375,36 +375,33 @@ val FeedbackRating = state(Interaction) {
         furhat.ask("That's great! Overall, how would you rate our previous conversation? Bad, ok, or good?")
     }
     onResponse<Bad> {
-        furhat.ask("That's sad to hear, but I'm glad you want to give me some tips. What would you like to see differently next time?")
+        furhat.say("That's sad to hear, but I'm glad you want to give me some tips. What would you like to see differently next time?")
         goto(Apologies)
     }
     onResponse<Ok> {
-        furhat.ask { "Ah I see, what could I have done differently so that you would have rated the conversation as good?"  }
+        furhat.say { "Ah I see, what could I have done differently so that you would have rated the conversation as good?"  }
         goto(Apologies)
     }
     onResponse<Good> {
-        furhat.ask { "That's nice to hear. What did you like most about it?" }
+        furhat.say { "That's nice to hear. What did you like most about it?" }
         goto(BetterNextTime)
     }
 }
 
 val BetterNextTime = state(Interaction){
     onEntry {
-        furhat.ask{"Thank you! Was there also anything that I could do better next time?"}
+        furhat.say{"Thank you! Was there also anything that I could do better next time?"}
         goto(TakeInAccount)
     }
 }
 
 val Apologies = state(Interaction) {
     onEntry {
-        val random = Random.nextInt(1, 3)
-        if (random == 1) {
-            furhat.ask("I am sorry to hear that.")
-        } else if (random == 2) {
-            furhat.say("That is very inconvenient")
-        } else if (random == 3) {
-            furhat.say("Our apologies.")
-        }
+        random(
+                { furhat.say("I am sorry to hear that.") },
+                { furhat.say("That is very inconvenient") },
+                { furhat.say("Our apologies.") }
+                )
         goto(AgreeAndPositive)
     }
 }
@@ -412,7 +409,7 @@ val Apologies = state(Interaction) {
 val AgreeAndPositive = state(Interaction){
     onEntry {
         furhat.say("I completely agree. Thank you for pointing that out.")
-        furhat.ask("Was there also something that you liked about our conversation?")
+        furhat.say("Was there also something that you liked about our conversation?")
         // TODO response when speaker is done
         goto(TakeInAccount)
     }
