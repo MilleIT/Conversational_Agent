@@ -77,7 +77,7 @@ class WrongPackage() : Intent() {
 
 class NoPackage() : Intent() {
     override fun getExamples(lang: Language): List<String> {
-        return listOf("My package didn't arrive")
+        return listOf("My package didn't arrive", "I didn't receive my package")
     }
 }
 
@@ -113,7 +113,7 @@ class Good() : Intent() {
 
 class Cancel() : Intent(){
     override fun getExamples(lang: Language): List<String> {
-        return listOf("I would like to cancel my order")
+        return listOf("I would like to cancel my order", "I want to cancel it", "I want to cancel my order", "cancel order")
     }
 }
 

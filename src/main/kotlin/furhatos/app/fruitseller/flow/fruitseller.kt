@@ -89,29 +89,6 @@ val Start = state(Interaction) {
         goto(Problem)
     }
 }
-/*val Options = state(Interaction) {
-    onResponse<BuyFruit> {
-        val fruits = it.intent.fruits
-        if (fruits != null) {
-            goto(OrderReceived(fruits))
-        }
-        else {
-            propagate()
-        }
-    }
-
-    onResponse<RequestOptions> {
-        furhat.say("We have ${Fruit().optionsToText()}")
-        furhat.ask("Do you want some?")
-    }
-
-    onResponse<Yes> {
-        random(
-                { furhat.ask("What kind of fruit do you want?") },
-                { furhat.ask("What type of fruit?") }
-        )
-    }
-}*/
 
 val Problem = state(Interaction) {
     onEntry {
@@ -122,16 +99,16 @@ val Problem = state(Interaction) {
                 "Do you want to tell me what happened?", endSil = 5000)
         furhat.attend(user = users.random)
     }
-    onInterimResponse(endSil = 1000) {
-        random (
-                //TODO dit kom vaak die okay
-                { furhat.say("Okay", async = true) },
-                { furhat.say("Hmm", async = true) },
-                { furhat.say("I see", async = true) },
-                { furhat.say("Right", async = true) },
-                { furhat.gesture(Gestures.Nod) }
-        )
-    }
+//    onInterimResponse(endSil = 1000) {
+//        random (
+//                //TODO dit kom vaak die okay, daarna herhaalt ie wat ik zei
+//                { furhat.say("Okay", async = true) },
+//                { furhat.say("Hmm", async = true) },
+//                { furhat.say("I see", async = true) },
+//                { furhat.say("Right", async = true) },
+//                { furhat.gesture(Gestures.Nod) }
+//        )
+//    }
     onResponse<No> {
         furhat.say("That's alright, let's focus on fixing this issue immediately.")
         goto(OrderAndName)
@@ -253,6 +230,15 @@ val NotSentYet = state(Interaction) {
     }
 }
 
+val CancelOrder = state(Interaction) {
+    onEntry {
+        furhat.say { "I will cancel the order right now and will send you a refund straight away. You can" +
+                " expect the money to be back on your account within 3 days. Also I will send you a 20% " +
+                "discount coupon for your next order, as a compromise for the inconvenience we caused you." }
+        goto(AnythingElse)
+    }
+}
+
 val ContinueOrder = state(Interaction) {
     onEntry {
         furhat.ask("Your order has been placed now. You will receive a comfirmation e-mail. Also we will send" +
@@ -271,17 +257,6 @@ val DeliveryDate = state(Interaction) {
         goto(AnythingElse)
     }
 }
-
-val CancelOrder = state(Interaction) {
-    onEntry {
-        furhat.say { "I will cancel the order right now and will send you a refund straight away. You can" +
-                " expect the money to be back on your acount within 3 days. Also I will send you a 20% " +
-                "discount coupon for your next order, as a compromise for the inconvenience we caused you." }
-        goto(AnythingElse)
-
-    }
-}
-
 
 val WrongPackage = state(Interaction) {
     onEntry {
