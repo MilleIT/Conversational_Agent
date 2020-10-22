@@ -80,7 +80,7 @@ class DaysInWeek() : Intent() {
 
 class NoDay() : Intent() {
     override fun getExamples(lang: Language): List<String> {
-        return listOf("No day")
+        return listOf("No day", "None", "I am not home this week")
     }
 }
 

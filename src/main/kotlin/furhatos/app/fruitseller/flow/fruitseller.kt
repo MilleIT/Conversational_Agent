@@ -146,11 +146,17 @@ val LookUpOrder = state(Interaction) {
         TimeUnit.SECONDS.sleep(2)
         furhat.ask({+"I can see here this is about the order of a"
                 random {
-                    + "15 inch Dell laptop"
-                    + "70 inch LG Television"
+                    block {
+                        + "15 inch Dell laptop"
+                        users.current.book.receivedOrder = "laptop"
                     }
+                    block{
+                        + "70 inch LG Television"
+                        users.current.book.receivedOrder = "television"
+                    }
+                }
                 +", is that right?"
-            }) //misschien onnodige vraag
+            })
 
     }
 
@@ -326,8 +332,8 @@ val NewOrder = state(Interaction) {
     onEntry {
         furhat.ask ("Ok, I made a new order for you for a " + users.current.book.intendedOrder +
             ". I've also added free priority shipping to compensate for the receivement of a wrong package." +
-                    " When we deliver the new order we'll take the wrongly received package with us. "+
-            "Could you tell me which day this week you'll be at home after 5 pm?" )
+                    " When we deliver the new order we'll take the wrongly received " + users.current.book.receivedOrder +
+                " with us. Could you tell me which day this week you'll be at home after 5 pm?" )
     }
 
     onResponse<DaysInWeek> {
@@ -336,8 +342,9 @@ val NewOrder = state(Interaction) {
     }
 
     onResponse<NoDay> {
-        furhat.say ("That's ok, since free retour lasts 30 days there is still time left to return @Order" +
-                "You can either make a return appointment at our website or keep the item." +
+        furhat.say ("That's ok, since free retour lasts 30 days there is still time left to return the " +
+                users.current.book.receivedOrder +
+                ". You can either make a return appointment at our website or keep the item." +
                 " Please note that if you keep the item, we can not offer a refund." )
     }
 }
