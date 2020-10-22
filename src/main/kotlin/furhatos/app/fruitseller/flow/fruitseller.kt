@@ -88,8 +88,11 @@ val Problem = state(Interaction) {
             goto(LookAround)
         }
         furhat.say("I'm sorry that you " + users.current.book.problem)
+        if (users.current.book.emotion == "unhappy") {
+            furhat.say("I have also noticed that you are unhappy")
+        }
 
-        furhat.ask("Do you want to tell me what happened?", endSil = 5000)
+        furhat.ask("Do you want to tell me what happened?")
         furhat.attend(user = users.random)
     }
 //    onInterimResponse(endSil = 1000) {
@@ -108,7 +111,13 @@ val Problem = state(Interaction) {
     }
     onResponse {
         furhat.say("Hmm I see. This is indeed not the service we would have wanted to " +
-                "provide you with. I'm sorry this happened. In order to make sure I have all " +
+                "provide you with. I'm sorry this happened.")
+        if (users.current.book.emotion == "happy") {
+            furhat.say ( "Looking at your smile it luckily appears to me that you are not greatly impacted by this problem" )
+        } else if (users.current.book.emotion == "unhappy") {
+        furhat.say ( "I understand that this whole ordeal has made you quite unhappy." )
+    }
+        furhat.say("In order to make sure I have all " +
                 "necessary information to fix this as soon as possible I'll ask you a couple of questions.")
         goto(OrderAndName)
     }
@@ -160,9 +169,23 @@ val LookForCause = state(Interaction) {
             goto(LookAround)
         }
         furhat.say("Alright then, now please give me a moment to retrieve the relevant data we have on this.")
-        TimeUnit.SECONDS.sleep(3)
+        TimeUnit.SECONDS.sleep(2)
+        furhat.attend(user = users.random)
+        // TODO check emotion
+        furhat.say("While I'm looking for the data, I've noticed you are " + users.current.book.emotion +
+                    " about this situation.")
+        if (users.current.book.emotion == "unhappy") {
+           furhat.say("I understand why you are unhappy and I'll try to fix the issue as fast as possible." +
+           "It will probably not take more than 5 minutes.")
+        } else if (users.current.book.emotion == "neutral") {
+            furhat.say( "I'm glad you are not very upset about the issue you are experiencing. Let's quickly finish this up." )
+        } else if (users.current.book.emotion == "happy") {
+            furhat.say( "I'm glad you are satisfied with our support. Let's quickly finish this up and solve your issue.")
+        }
+
         furhat.attend(user = users.random)
 
+        // TODO dit is beetje warrig geprogameerd. Ene keer is random in deze val, andere keer na goto
         if(users.current.book.problem == "Got the wrong package") {
             goto(WrongPackage)
         }
@@ -206,7 +229,7 @@ val FoundOrder = state(Interaction) {
             + "the 50 inch Phillips television"
         }
         }) // Moet hier order variable storen
-        TimeUnit.SECONDS.sleep(1)
+       // TimeUnit.SECONDS.sleep(1) HEB DIT FF UITGECOMMENT, SNAP NIET WAAROM WE EEN SECONDE STILTE LATEN VALLEN
         goto(LookForCause)
     }
 }
@@ -366,6 +389,11 @@ val AnythingElse = state(Interaction) {
     }
 
     onResponse<Yes> {
+        if (users.current.book.emotion == "unhappy") {
+            furhat.say("I'm sorry you are still unhappy with the whole situation")
+        } else if (users.current.book.emotion == "happy") {
+            furhat.say("I'm glad that I could be of service and it appears to me that you are satisfied with my support")
+        }
         furhat.say("I think that one of my collegues can be of better help, I'll put you through.")
     }
 
@@ -376,6 +404,13 @@ val AnythingElse = state(Interaction) {
 
 val AskForFeedback = state(Interaction) {
     onEntry {
+        if (users.current.book.emotion == "unhappy") {
+            furhat.say("I've noticed you are unhappy. It would be great for me to know what caused this unhappiness.")
+        } else if (users.current.book.emotion == "neutral") {
+            furhat.say("I have a hard time esimating your emotions")
+        } else if (users.current.book.emotion == "happy") {
+            furhat.say("I've noticed you are happy. So it would be great if you told me what caused you to be happy.")
+        }
         var givesFeedback = furhat.askYN("As you know I'm a bot that is ever improving. Would you be willing to give me " +
                 "some tips so that I can provide you with a better service in the future?")
         if(givesFeedback!!) {
@@ -395,18 +430,18 @@ val FeedbackRating = state(Interaction) {
         goto(Apologies)
     }
     onResponse<Ok> {
-        furhat.say { "Ah I see, what could I have done differently so that you would have rated the conversation as good?"  }
+        furhat.say ( "Ah I see, what could I have done differently so that you would have rated the conversation as good?"  )
         goto(Apologies)
     }
     onResponse<Good> {
-        furhat.say { "That's nice to hear. What did you like most about it?" }
+        furhat.say ( "That's nice to hear. What did you like most about it?" )
         goto(BetterNextTime)
     }
 }
 
 val BetterNextTime = state(Interaction){
     onEntry {
-        furhat.say{"Thank you! Was there also anything that I could do better next time?"}
+        furhat.say("Thank you! Was there also anything that I could do better next time?")
         goto(TakeInAccount)
     }
 }
@@ -433,8 +468,8 @@ val AgreeAndPositive = state(Interaction){
 
 val TakeInAccount = state(Interaction){
     onEntry {
-        furhat.say { "Thank you for the feedback. I will take everything into account and learn from this." }
-        furhat.say { "I wish you a very nice day!" }
+        furhat.say ( "Thank you for the feedback. I will take everything into account and learn from this." )
+        furhat.say ( "I wish you a very nice day!" )
     }
 }
 

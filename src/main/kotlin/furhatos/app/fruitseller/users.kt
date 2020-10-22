@@ -10,7 +10,8 @@ import furhatos.nlu.common.Number
 class UserData (
         var orderNumber : Number? = Number(0),
         var name : String? = null,
-        var problem : String? = null
+        var problem : String? = null,
+        var emotion: String? = null
 )
 
 
