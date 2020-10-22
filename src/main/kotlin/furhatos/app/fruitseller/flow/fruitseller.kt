@@ -255,9 +255,9 @@ val OnItsWay = state(Interaction){
 
 val ReturnPackage = state(Interaction){
     onEntry {
-        furhat.say { "I am sorry to hear that. I send you a coupon you can use to have the product" +
+        furhat.say ( "I am sorry to hear that. I send you a coupon you can use to have the product" +
                 " returned and picked up from your home for free. On our website you can choose when " +
-                "you would like the product to be picked up." }
+                "you would like the product to be picked up." )
         goto(AnythingElse)
     }
 }
@@ -278,9 +278,9 @@ val NotSentYet = state(Interaction) {
 
 val CancelOrder = state(Interaction) {
     onEntry {
-        furhat.say { "I will cancel the order right now and will send you a refund straight away. You can" +
+        furhat.say ( "I will cancel the order right now and will send you a refund straight away. You can" +
                 " expect the money to be back on your account within 3 days. Also I will send you a 20% " +
-                "discount coupon for your next order, as a compromise for the inconvenience we caused you." }
+                "discount coupon for your next order, as a compromise for the inconvenience we caused you." )
         goto(AnythingElse)
     }
 }
@@ -297,8 +297,8 @@ val ContinueOrder = state(Interaction) {
 
 val DeliveryDate = state(Interaction) {
     onEntry {
-        furhat.say { "That is unfortunate. In the e-mail you have received you can select another delivery" +
-                " date or choose to have your package delivered to a pick-up point." }
+        furhat.say ( "That is unfortunate. In the e-mail you have received you can select another delivery" +
+                " date or choose to have your package delivered to a pick-up point." )
         goto(AnythingElse)
     }
 }
