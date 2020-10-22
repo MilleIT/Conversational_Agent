@@ -61,7 +61,7 @@ val Start = state(Interaction) {
         furhat.attend(user = users.random)
         val problem = furhat.ask("Hello, I'm Furhat and I will be assisting you today. " +
                 "Could you tell me what problem you are experiencing? " +
-                "I can help when a package is late or lost, a wrong package is delivered, or refund is received.")
+                "I can help when a package is late or lost, a wrong package is delivered, or no refund is received.")
         if (problem == "I got the wrong package") {
             users.current.book.problem  = "got the wrong package"
         }
@@ -79,13 +79,16 @@ val Start = state(Interaction) {
 
     onResponse<WrongPackage> {
         // TODO SAVE THAT PACKAGE IS WRONG
+        users.current.book.problem = "Got the wrong package."
         goto(Problem)
 
     }
     onResponse<NoPackage> {
+        users.current.book.problem = "Didn't receive the package."
         goto(Problem)
     }
     onResponse<NoRefund> {
+        users.current.book.problem = "Didn't receive a refund."
         goto(Problem)
     }
 }
@@ -116,6 +119,7 @@ val Start = state(Interaction) {
 val Problem = state(Interaction) {
     onEntry {
         parallel {
+            goto(RunPython) //Is dit de bedoeling
             goto(LookAround)
         }
         furhat.ask("I'm sorry that you " + users.current.book.problem +
