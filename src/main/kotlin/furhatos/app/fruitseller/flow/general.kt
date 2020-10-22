@@ -25,7 +25,7 @@ val Idle : State = state {
         furhat.setVoice(Language.ENGLISH_US, "Matthew")
         if (users.count > 0) {
             furhat.attend(users.random)
-            goto(NotSentYet)
+            goto(Start)
             //goto(FurtherDetails)
 //            goto(SpecificWishes)
         }

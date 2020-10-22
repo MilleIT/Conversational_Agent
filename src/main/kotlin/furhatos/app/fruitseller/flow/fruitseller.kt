@@ -59,36 +59,24 @@ val Start = state(Interaction) {
             goto(RunPython)
         }
         furhat.attend(user = users.random)
-        val problem = furhat.ask("Hello welcome to the live support of Bol.com. My name is Furhat and I will be assisting you today. " +
+        furhat.ask("Hello, welcome to the live support of Bol.com. My name is Furhat and I will be assisting you today. " +
                 "Could you tell me what problem you are experiencing? " +
-                "I can help when a package is late or lost, a wrong package is delivered, or refund is not received.")
-        if (problem == "I got the wrong package") {
-            users.current.book.problem  = "got the wrong package"
-        }
-        else if (problem == "My package didn't arrive") {
-            users.current.book.problem  = "didn't receive package"
-        }
-        else if (problem == "I didn't receive my refund") {
-            users.current.book.problem  = "didn't receive refund"
-        }
-        else { // TODO dit werkt nog niet nice
-            furhat.say("Sorry I can only help you with the three problems mentioned before. Please call 030 310 49 99 for any other questions.")
-        }
+                "I can help when a package is late or lost, a wrong package is delivered, or a refund is not received.")
         goto(NoRefund)
     }
 
     onResponse<WrongPackage> {
         // TODO SAVE THAT PACKAGE IS WRONG
-        users.current.book.problem = "Got the wrong package."
+        users.current.book.problem = "Got the wrong package"
         goto(Problem)
 
     }
     onResponse<NoPackage> {
-        users.current.book.problem = "Didn't receive the package."
+        users.current.book.problem = "Didn't receive the package"
         goto(Problem)
     }
     onResponse<NoRefund> {
-        users.current.book.problem = "Didn't receive a refund."
+        users.current.book.problem = "Didn't receive a refund"
         goto(Problem)
     }
 }
@@ -99,8 +87,9 @@ val Problem = state(Interaction) {
             goto(RunPython) //Is dit de bedoeling
             goto(LookAround)
         }
-        furhat.ask("I'm sorry that you " + users.current.book.problem +
-                "Do you want to tell me what happened?", endSil = 5000)
+        furhat.say("I'm sorry that you " + users.current.book.problem)
+
+        furhat.ask("Do you want to tell me what happened?", endSil = 5000)
         furhat.attend(user = users.random)
     }
 //    onInterimResponse(endSil = 1000) {
@@ -166,8 +155,20 @@ val LookForCause = state(Interaction) {
         furhat.say("Alright then, now please give me a moment to retrieve the relevant data we have on this.")
         TimeUnit.SECONDS.sleep(3)
         furhat.attend(user = users.random)
-        //furhat.ask("") // TODO SPLITSING NAAR ALLE ONDERWERPEN
-        goto(NoRefund)
+
+        if(users.current.book.problem == "Got the wrong package") {
+            goto(WrongPackage)
+        }
+        else if (users.current.book.problem == "Didn't receive the package") {
+            random (
+                    {goto(NotSentYet) },
+                    {goto(OnItsWay) }
+            )
+
+        }
+        else if (users.current.book.problem == "Didn't receive a refund") {
+            goto(NoRefund)
+        }
 
     }
 }
