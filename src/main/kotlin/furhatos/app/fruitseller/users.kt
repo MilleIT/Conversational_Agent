@@ -11,7 +11,8 @@ class UserData (
         var orderNumber : Number? = Number(0),
         var name : String? = null,
         var problem : String? = null,
-        var emotion: String? = null
+        var emotion: String? = null,
+        var intendedOrder: String? = null
 )
 
 

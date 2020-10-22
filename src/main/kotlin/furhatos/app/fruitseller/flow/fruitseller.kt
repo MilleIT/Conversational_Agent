@@ -183,7 +183,7 @@ val LookForCause = state(Interaction) {
             furhat.say( "I'm glad you are satisfied with our support. Let's quickly finish this up and solve your issue.")
         }
 
-        furhat.attend(user = users.random)
+//        furhat.attend(user = users.random)
 
         // TODO dit is beetje warrig geprogameerd. Ene keer is random in deze val, andere keer na goto
         if(users.current.book.problem == "Got the wrong package") {
@@ -289,7 +289,6 @@ val ContinueOrder = state(Interaction) {
     }
 }
 
-
 val DeliveryDate = state(Interaction) {
     onEntry {
         furhat.say { "That is unfortunate. In the e-mail you have received you can select another delivery" +
@@ -300,35 +299,46 @@ val DeliveryDate = state(Interaction) {
 
 val WrongPackage = state(Interaction) {
     onEntry {
-        furhat.ask {
+        furhat.ask(
             "It looks like something went wrong with the processing of your order," +
                     " could you tell me what you intended to order? " +
-                    "Please note that the only items we sell are laptops, Tv's, Playstations and headphones." }
+                    "Please note that the only items we sell are laptops, Tv's, Playstations and headphones." )
         }
-
-    onResponse<IntendedOrder> {
-        // if intended order == order ->goto(sameOrder)
+    onResponse<Headphones> {
+        users.current.book.intendedOrder = "headphone"
         goto(NewOrder)
     }
+    onResponse<Television> {
+        users.current.book.intendedOrder = "television"
+        goto(NewOrder)
     }
+    onResponse<Laptop> {
+        users.current.book.intendedOrder = "laptop"
+        goto(NewOrder)
+    }
+    onResponse<Playstation> {
+        users.current.book.intendedOrder = "playstation"
+        goto(NewOrder)
+    }
+}
 
 val NewOrder = state(Interaction) {
     onEntry {
-        furhat.ask { "Ok, I made a new order for you for a @newOrder"
-            "I've also added free priority shipping to compensate for the receivement of a wrong package." +
-                    " When we deliver the new order we'll take the wrongly received @Order with us."
-            "Could you tell me which day this week you'll be at home after 5 pm?" }
+        furhat.ask ("Ok, I made a new order for you for a " + users.current.book.intendedOrder +
+            ". I've also added free priority shipping to compensate for the receivement of a wrong package." +
+                    " When we deliver the new order we'll take the wrongly received package with us. "+
+            "Could you tell me which day this week you'll be at home after 5 pm?" )
     }
 
     onResponse<DaysInWeek> {
-        furhat.say { "Excellent, I have send a confirmation mail to the same email as your previous order." +
-                " We'll see you on @Day" }
+        furhat.say ("Excellent, I have send a confirmation mail to the same email as your previous order." +
+                " We'll see you on @Day" )
     }
 
     onResponse<NoDay> {
-        furhat.say { "That's ok, since free retour lasts 30 days there is still time left to return @Order" +
+        furhat.say ("That's ok, since free retour lasts 30 days there is still time left to return @Order" +
                 "You can either make a return appointment at our website or keep the item." +
-                " Please note that if you keep the item, we can not offer a refund." }
+                " Please note that if you keep the item, we can not offer a refund." )
     }
 }
 

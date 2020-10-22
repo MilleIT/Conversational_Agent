@@ -51,9 +51,24 @@ class Person : EnumEntity(stemming = true, speechRecPhrases = true) {
 //    }
 //}
 
-class IntendedOrder() : Intent() {
+class Headphones() : Intent() {
     override fun getExamples(lang: Language): List<String> {
-        return listOf("Headphone", "Laptop", "TV", "Playstation")
+        return listOf("Headphones")
+    }
+}
+class Laptop() : Intent() {
+    override fun getExamples(lang: Language): List<String> {
+        return listOf("Laptop")
+    }
+}
+class Television() : Intent() {
+    override fun getExamples(lang: Language): List<String> {
+        return listOf("Television", "TV")
+    }
+}
+class Playstation() : Intent() {
+    override fun getExamples(lang: Language): List<String> {
+        return listOf("Playstation")
     }
 }
 
