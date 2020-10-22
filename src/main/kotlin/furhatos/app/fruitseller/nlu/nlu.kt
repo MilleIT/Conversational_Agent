@@ -89,7 +89,13 @@ class NoRefund() : Intent() {
 
 class OrderAndName(var ordernumber : Number? = null, var name : PersonName? = null) : Intent() {
     override fun getExamples(lang: Language): List<String> {
-        return listOf("@ordernumber, @name", "My ordernumber is @ordernumber and my name is @name")
+        return listOf("@ordernumber, @name", "My ordernumber is @ordernumber and my last name is @name")
+    }
+}
+
+class OrderNumber(var ordernumber : Number? = null) : Intent() {
+    override fun getExamples(lang: Language): List<String> {
+        return listOf("@ordernumber", "My ordernumber is @ordernumber")
     }
 }
 

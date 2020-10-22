@@ -11,6 +11,7 @@ import furhatos.nlu.common.*
 import furhatos.nlu.common.Number
 import furhatos.records.Location
 import furhatos.util.Language
+import org.apache.logging.log4j.core.config.Order
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
@@ -79,16 +80,16 @@ val Start = state(Interaction) {
 
     onResponse<WrongPackage> {
         // TODO SAVE THAT PACKAGE IS WRONG
-        users.current.book.problem = "Got the wrong package."
+        users.current.book.problem = "got the wrong package."
         goto(Problem)
 
     }
     onResponse<NoPackage> {
-        users.current.book.problem = "Didn't receive the package."
+        users.current.book.problem = "didn't receive the package."
         goto(Problem)
     }
     onResponse<NoRefund> {
-        users.current.book.problem = "Didn't receive a refund."
+        users.current.book.problem = "didn't receive a refund."
         goto(Problem)
     }
 }
@@ -100,7 +101,7 @@ val Problem = state(Interaction) {
             goto(LookAround)
         }
         furhat.ask("I'm sorry that you " + users.current.book.problem +
-                "Do you want to tell me what happened?", endSil = 5000)
+                " Do you want to tell me what happened?", endSil = 5000)
         furhat.attend(user = users.random)
     }
 //    onInterimResponse(endSil = 1000) {
@@ -127,7 +128,7 @@ val Problem = state(Interaction) {
 
 val OrderAndName = state(Interaction) {
     onEntry {
-        furhat.ask("Can I have your order number and last name?")
+        furhat.ask("Can I have your order number and first name?")
     }
 
     onResponse<OrderAndName> {
@@ -146,7 +147,14 @@ val LookUpOrder = state(Interaction) {
         furhat.say("Thank you, I'll look up your order straight away.")
         furhat.attend(Loc())
         TimeUnit.SECONDS.sleep(2)
-        furhat.ask("I can see here this is about order @Order, is that right?") //misschien onnodige vraag
+        furhat.ask({+"I can see here this is about the order of a"
+                random {
+                    + "15 inch Dell laptop"
+                    + "70 inch LG Television"
+                    }
+                +", is that right?"
+            }) //misschien onnodige vraag
+
     }
 
     onResponse<No> {
@@ -182,7 +190,7 @@ val TryOrderAgain = state(Interaction) {
     onResponse<No> { // TODO not an order number
         reentry()
     }
-    onResponse<Yes> { // TODO change to order number
+    onResponse<OrderNumber> {
         goto(FoundOrder)
     }
 
@@ -192,7 +200,12 @@ val FoundOrder = state(Interaction) {
     onEntry {
         furhat.say ( "Ok, let me check." )
         TimeUnit.SECONDS.sleep(3)
-        furhat.say ( "Thank you for your patience, I have found your order." ) // Moet hier order variable storen
+        furhat.say ( {+"Thank you for your patience, I have found your order, "
+        random{
+            + "the 13 inch HP laptop."
+            + "the 50 inch Phillips television"
+        }
+        }) // Moet hier order variable storen
         TimeUnit.SECONDS.sleep(1)
         goto(LookForCause)
     }
