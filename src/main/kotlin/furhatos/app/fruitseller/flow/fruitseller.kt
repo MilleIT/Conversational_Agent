@@ -79,13 +79,16 @@ val Start = state(Interaction) {
 
     onResponse<WrongPackage> {
         // TODO SAVE THAT PACKAGE IS WRONG
+        users.current.book.problem = "Got the wrong package."
         goto(Problem)
 
     }
     onResponse<NoPackage> {
+        users.current.book.problem = "Didn't receive the package."
         goto(Problem)
     }
     onResponse<NoRefund> {
+        users.current.book.problem = "Didn't receive a refund."
         goto(Problem)
     }
 }
@@ -93,6 +96,7 @@ val Start = state(Interaction) {
 val Problem = state(Interaction) {
     onEntry {
         parallel {
+            goto(RunPython) //Is dit de bedoeling
             goto(LookAround)
         }
         furhat.ask("I'm sorry that you " + users.current.book.problem +
