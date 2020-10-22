@@ -59,9 +59,9 @@ val Start = state(Interaction) {
             goto(RunPython)
         }
         furhat.attend(user = users.random)
-        val problem = furhat.ask("Hello, I'm Furhat and I will be assisting you today. " +
+        val problem = furhat.ask("Hello welcome to the live support of Bol.com. My name is Furhat and I will be assisting you today. " +
                 "Could you tell me what problem you are experiencing? " +
-                "I can help when a package is late or lost, a wrong package is delivered, or refund is received.")
+                "I can help when a package is late or lost, a wrong package is delivered, or refund is not received.")
         if (problem == "I got the wrong package") {
             users.current.book.problem  = "got the wrong package"
         }
@@ -124,6 +124,7 @@ val Problem = state(Interaction) {
     }
     onInterimResponse(endSil = 1000) {
         random (
+                //TODO dit kom vaak die okay
                 { furhat.say("Okay", async = true) },
                 { furhat.say("Hmm", async = true) },
                 { furhat.say("I see", async = true) },

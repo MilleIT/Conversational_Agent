@@ -87,10 +87,9 @@ class NoRefund() : Intent() {
     }
 }
 
-class OrderAndName() : Intent() {
+class OrderAndName(var ordernumber : Number? = null, var name : PersonName? = null) : Intent() {
     override fun getExamples(lang: Language): List<String> {
-        return listOf("I didn't receive my refund") //MOET VARIABLE KUNNEN ACCEPTEN!
-        // variabelen zijn "@variabele als in: "ik wil @hoeveelheid appels" accepteerd "ik wil 12 appels" met @variabele = 12
+        return listOf("@ordernumber, @name", "My ordernumber is @ordernumber and my name is @name")
     }
 }
 
