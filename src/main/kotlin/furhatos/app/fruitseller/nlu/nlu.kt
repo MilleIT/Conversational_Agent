@@ -43,13 +43,17 @@ class Person : EnumEntity(stemming = true, speechRecPhrases = true) {
     }
 }
 
+class AvailableDays(var days : Days? = null) : ComplexEnumEntity() {
+    override fun getEnum(lang: Language): List<String> {
+        return listOf("@days")
+    }
+}
 
-
-//class BuyFruit(var fruits : FruitList? = null) : Intent() {
-//    override fun getExamples(lang: Language): List<String> {
-//        return listOf("@fruits", "I want @fruits", "I would like @fruits", "I want to buy @fruits")
-//    }
-//}
+class Days : EnumEntity(stemming = true, speechRecPhrases = true) {
+    override fun getEnum(lang: Language): List<String> {
+        return listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+    }
+}
 
 class Headphones() : Intent() {
     override fun getExamples(lang: Language): List<String> {
@@ -69,12 +73,6 @@ class Television() : Intent() {
 class Playstation() : Intent() {
     override fun getExamples(lang: Language): List<String> {
         return listOf("Playstation")
-    }
-}
-
-class DaysInWeek() : Intent() {
-    override fun getExamples(lang: Language): List<String> {
-        return listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
     }
 }
 
@@ -161,6 +159,8 @@ class Confirm() : Intent() {
         return listOf("Okay", "Allright")
     }
 }
+
+
 
 
 

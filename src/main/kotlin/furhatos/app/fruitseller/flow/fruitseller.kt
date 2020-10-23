@@ -312,21 +312,81 @@ val WrongPackage = state(Interaction) {
         }
     onResponse<Headphones> {
         users.current.book.intendedOrder = "headphone"
-        goto(NewOrder)
+        if( users.current.book.intendedOrder == users.current.book.receivedOrder){
+            goto(SameOrder)
+        }else{
+            goto(NewOrder)
+        }
     }
     onResponse<Television> {
         users.current.book.intendedOrder = "television"
-        goto(NewOrder)
+        if( users.current.book.intendedOrder == users.current.book.receivedOrder){
+            goto(SameOrder)
+        }else{
+            goto(NewOrder)
+        }    }
+    onResponse<Laptop> {
+        users.current.book.intendedOrder = "laptop"
+        if( users.current.book.intendedOrder == users.current.book.receivedOrder){
+            goto(SameOrder)
+        }else{
+            goto(NewOrder)
+        }    }
+    onResponse<Playstation> {
+        users.current.book.intendedOrder = "playstation"
+        if( users.current.book.intendedOrder == users.current.book.receivedOrder){
+            goto(SameOrder)
+        }else{
+            goto(NewOrder)
+        }
+    }
+}
+
+val SameOrder = state(Interaction){
+    onEntry {
+        furhat.ask("You've stated that you received a " +  users.current.book.receivedOrder +
+                ". It appears that what you intended to order has already been send to you, are " +
+                "you sure you meant a " + users.current.book.intendedOrder)
+    }
+    onResponse<No> {
+        goto(IntendedOrder)
+    }
+    onResponse<Yes> {
+        goto(CantHelp)
+    }
+}
+
+val IntendedOrder = state(Interaction) {
+    onEntry {
+        furhat.ask("What did you intend to order? Please note that the only " +
+                "items we sell are laptops, Tv's, Playstations and headphones.")
+    }
+    onResponse<Headphones> {
+        users.current.book.intendedOrder = "headphone"
+            goto(NewOrder)
+    }
+    onResponse<Television> {
+        users.current.book.intendedOrder = "television"
+            goto(NewOrder)
     }
     onResponse<Laptop> {
         users.current.book.intendedOrder = "laptop"
-        goto(NewOrder)
+            goto(NewOrder)
     }
     onResponse<Playstation> {
         users.current.book.intendedOrder = "playstation"
-        goto(NewOrder)
+            goto(NewOrder)
     }
 }
+
+val CantHelp = state(Interaction) {
+    onEntry {
+        furhat.say("Then I'm not sure how I can help with your problem. Please search " +
+                "for human support at our website. I hope you find your solution there!")
+        goto(AnythingElse)
+    }
+}
+
 
 val NewOrder = state(Interaction) {
     onEntry {
@@ -336,9 +396,10 @@ val NewOrder = state(Interaction) {
                 " with us. Could you tell me which day this week you'll be at home after 5 pm?" )
     }
 
-    onResponse<DaysInWeek> {
+    onResponse<AvailableDays> {
         furhat.say ("Excellent, I have send a confirmation mail to the same email as your previous order." +
-                " We'll see you on @Day" )
+                " We'll see you on "+ users.current.book.days )
+        goto(AskForFeedback)
     }
 
     onResponse<NoDay> {
@@ -346,6 +407,7 @@ val NewOrder = state(Interaction) {
                 users.current.book.receivedOrder +
                 ". You can either make a return appointment at our website or keep the item." +
                 " Please note that if you keep the item, we can not offer a refund." )
+        goto(AskForFeedback)
     }
 }
 
