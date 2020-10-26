@@ -25,8 +25,24 @@ fun Loc(): Location {
     return location
 }
 
+fun LocQuestion(): Location {
+    val i = Random.nextInt(-1,1)
+    var x = 0
+    var y = 0
+    if (i<0) {
+        x = 2
+        y = 2
+    } else {
+        x = -2
+        y = 2
+    }
+    val location = Location(x,y,20)
+    return location
+}
+
 val LookAround = state(Interaction) {
     onEntry {
+        delay(Random.nextInt(0,2).toLong())
         furhat.attend(Loc())
         delay(Random.nextInt(500,3000).toLong())
         furhat.attend(user = users.current)
@@ -54,14 +70,19 @@ val RunPython = state(Interaction) {
 }
 
 val Start = state(Interaction) {
+
     onEntry {
         parallel {
             goto(RunPython)
         }
         furhat.attend(user = users.random)
-        furhat.ask("Hello, welcome to the live support of Bol.com. My name is Furhat and I will be assisting you today. " +
-                "Could you tell me what problem you are experiencing? " +
-                "I can help when a package is late or lost, a wrong package is delivered, or a refund is not received.")
+        furhat.say("Hello, welcome to the live support of Bol.com. My name is Furhat and I will be assisting you today. " +
+                "Could you tell me what problem you are experiencing? ")
+        parallel {
+            goto (LookAround)
+        }
+
+                furhat.ask("I can help when a package is late or lost, a wrong package is delivered, or a refund is not received.")
         goto(NoRefund)
     }
 
@@ -85,16 +106,19 @@ val Problem = state(Interaction) {
     onEntry {
         parallel {
             goto(RunPython) //Is dit de bedoeling
+        }
+        parallel {
             goto(LookAround)
         }
         furhat.say("I'm sorry that you " + users.current.book.problem)
         if (users.current.book.emotion == "unhappy") {
             furhat.say("I have also noticed that you are unhappy")
         }
-
+        furhat.attend(LocQuestion())
         furhat.ask("Do you want to tell me what happened?")
         furhat.attend(user = users.random)
     }
+
 //    onInterimResponse(endSil = 1000) {
 //        random (
 //                //TODO dit kom vaak die okay, daarna herhaalt ie wat ik zei
@@ -106,10 +130,16 @@ val Problem = state(Interaction) {
 //        )
 //    }
     onResponse<No> {
+        parallel {
+            goto(LookAround)
+        }
         furhat.say("That's alright, let's focus on fixing this issue immediately.")
         goto(OrderAndName)
     }
     onResponse {
+        parallel {
+            goto(LookAround)
+        }
         furhat.say("Hmm I see. This is indeed not the service we would have wanted to " +
                 "provide you with. I'm sorry this happened.")
         if (users.current.book.emotion == "happy") {
@@ -125,6 +155,7 @@ val Problem = state(Interaction) {
 
 val OrderAndName = state(Interaction) {
     onEntry {
+        furhat.attend(LocQuestion())
         furhat.ask("Can I have your order number and first name?")
     }
 
@@ -142,15 +173,18 @@ val LookUpOrder = state(Interaction) {
     onEntry {
         furhat.attend(user = users.random)
         furhat.say("Thank you, I'll look up your order straight away.")
-        furhat.attend(Loc())
+        parallel {
+            goto (LookAround)
+        }
         TimeUnit.SECONDS.sleep(2)
-        furhat.ask({+"I can see here this is about the order of a"
+        furhat.say({+"I can see here this is about the order of a"
                 random {
-                    + "15 inch Dell laptop"
-                    + "70 inch LG Television"
-                    }
-                +", is that right?"
-            }) //misschien onnodige vraag
+                    +"15 inch Dell laptop"
+                    +"70 inch LG Television"
+                }
+            })
+        furhat.attend(LocQuestion())
+        furhat.ask("Is that right?")//misschien onnodige vraag
 
     }
 
@@ -258,9 +292,10 @@ val ReturnPackage = state(Interaction){
 
 val NotSentYet = state(Interaction) {
     onEntry {
-        furhat.ask("It looks like something went wrong with the processing of your order. " +
-                "The product has not been send to you, we are very sorry for the inconvenience. " +
-                "Would you still like to receive the product or would you like to cancel your order? ")
+        furhat.say("It looks like something went wrong with the processing of your order. " +
+                "The product has not been send to you, we are very sorry for the inconvenience. ")
+        furhat.attend(LocQuestion())
+        furhat.ask("Would you still like to receive the product or would you like to cancel your order? ")
     }
     onResponse<Cancel> {
         goto(CancelOrder)
@@ -300,11 +335,12 @@ val DeliveryDate = state(Interaction) {
 
 val WrongPackage = state(Interaction) {
     onEntry {
-        furhat.ask {
-            "It looks like something went wrong with the processing of your order," +
-                    " could you tell me what you intended to order? " +
-                    "Please note that the only items we sell are laptops, Tv's, Playstations and headphones." }
-        }
+        furhat.say ("It looks like something went wrong with the processing of your order,")
+        furhat.attend(LocQuestion())
+        furhat.say(" could you tell me what you intended to order? ")
+        furhat.attend(user = users.current)
+        furhat.say("Please note that the only items we sell are laptops, Tv's, Playstations and headphones.") }
+
 
     onResponse<IntendedOrder> {
         // if intended order == order ->goto(sameOrder)
