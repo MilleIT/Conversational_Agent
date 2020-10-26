@@ -43,29 +43,42 @@ class Person : EnumEntity(stemming = true, speechRecPhrases = true) {
     }
 }
 
-
-
-//class BuyFruit(var fruits : FruitList? = null) : Intent() {
-//    override fun getExamples(lang: Language): List<String> {
-//        return listOf("@fruits", "I want @fruits", "I would like @fruits", "I want to buy @fruits")
-//    }
-//}
-
-class IntendedOrder() : Intent() {
-    override fun getExamples(lang: Language): List<String> {
-        return listOf("Headphone", "Laptop", "TV", "Playstation")
+class AvailableDays(var days : Days? = null) : ComplexEnumEntity() {
+    override fun getEnum(lang: Language): List<String> {
+        return listOf("@days")
     }
 }
 
-class DaysInWeek() : Intent() {
-    override fun getExamples(lang: Language): List<String> {
+class Days : EnumEntity(stemming = true, speechRecPhrases = true) {
+    override fun getEnum(lang: Language): List<String> {
         return listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+    }
+}
+
+class Headphones() : Intent() {
+    override fun getExamples(lang: Language): List<String> {
+        return listOf("Headphones")
+    }
+}
+class Laptop() : Intent() {
+    override fun getExamples(lang: Language): List<String> {
+        return listOf("Laptop")
+    }
+}
+class Television() : Intent() {
+    override fun getExamples(lang: Language): List<String> {
+        return listOf("Television", "TV")
+    }
+}
+class Playstation() : Intent() {
+    override fun getExamples(lang: Language): List<String> {
+        return listOf("Playstation")
     }
 }
 
 class NoDay() : Intent() {
     override fun getExamples(lang: Language): List<String> {
-        return listOf("No day")
+        return listOf("No day", "None", "I am not home this week")
     }
 }
 
@@ -146,6 +159,8 @@ class Confirm() : Intent() {
         return listOf("Okay", "Allright")
     }
 }
+
+
 
 
 
