@@ -2,22 +2,18 @@ package furhatos.app.fruitseller.flow
 
 import furhatos.app.fruitseller.book
 import furhatos.app.fruitseller.nlu.*
+import furhatos.app.fruitseller.pythonLoc
+import furhatos.app.fruitseller.scriptPath
 /*
 import furhatos.app.fruitseller.order
 */
 import furhatos.flow.kotlin.*
-import furhatos.gestures.Gestures
 import furhatos.nlu.common.*
-import furhatos.nlu.common.Number
 import furhatos.records.Location
-import furhatos.util.Language
-import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
-import java.net.Inet4Address
 import java.util.*
 import java.util.concurrent.TimeUnit
-import java.util.stream.Collectors
 import kotlin.random.Random
 fun Loc(): Location {
     val x = Random.nextInt(-5,5)
@@ -37,9 +33,9 @@ val LookAround = state(Interaction) {
 
 val RunPython = state(Interaction) {
     onEntry {
-        val pythonLoc = "C:\\Users\\mille\\.pyenv\\pyenv-win\\versions\\3.6.6\\python" //must be location of python.exe for python 3.6.6
-        val command = listOf<String>(pythonLoc,"kotlinclient.py")
-        val path : File = File("C:\\Users\\mille\\PycharmProjects\\pythonsockets") // must be directory where eval_script.py is located
+        val loc = pythonLoc //must be location of python.exe for python 3.6.6
+        val command = listOf<String>(loc,"kotlinclient.py")
+        val path : File = File(scriptPath) // must be directory where kotlinclient.py is located
         println("Command: $command")
         //val process = Runtime.getRuntime().exec(command, null, path)
         val pb = ProcessBuilder(command)
