@@ -72,7 +72,6 @@ val Start = state(Interaction) {
         furhat.ask("Hello, welcome to the live support of Bol.com. My name is Furhat and I will be assisting you today. " +
                 "Could you tell me what problem you are experiencing? " +
                 "I can help when a package is late or lost, a wrong package is delivered, or a refund is not received.")
-        goto(NoRefund)
     }
 
     onReentry {
@@ -92,10 +91,9 @@ val Start = state(Interaction) {
         else { // TODO dit werkt nog niet nice
             furhat.say("Sorry I can only help you with the three problems mentioned before. Please call 030 310 49 99 for any other questions.")
         }
-        goto(NoRefund) }
+    }
 
     onResponse<WrongPackage> {
-        // TODO SAVE THAT PACKAGE IS WRONG
         users.current.book.problem = "Got the wrong package"
         goto(Problem)
 
@@ -232,7 +230,12 @@ val LookForCause = state(Interaction) {
 
         }
         else if (users.current.book.problem == "Didn't receive a refund") {
-            goto(NoRefund)
+
+            random(
+                    {goto(RefundDelay)},
+                    {goto(RefundInMotion)},
+                    {goto(RefundNotStarted)}
+            )
         }
 
     }
@@ -440,23 +443,39 @@ val NewOrder = state(Interaction) {
     }
 }
 
-val NoRefund = state(Interaction) {
+
+val RefundDelay = state(Interaction){
     onEntry {
-        parallel {
+        parallel{
             goto(LookAround)
         }
-        random (
-                { furhat.say("The refund should indeed have taken place, as the product was already returned to us 2 days ago. I apologize for this delay and make sure we send you the refund within 24 hours.")
-                    goto(AnythingElse) },
-                {furhat.say("It seems like the product you returned has only just arrived today. The payment process has been set in motion and you will be refunded within 24 hours.")
-                    goto(AnythingElse) },
-                {val overFiveDays = furhat.askYN("It looks like the product you returned has not arrived at our storage center yet. Did you mail it more than five days ago?")
-                    if (overFiveDays!!) {
-                        goto(RefundNotFixed)
-                    } else {
-                        goto(RefundFixed)
-                    } }
-        )
+        furhat.say("The refund should indeed have taken place, as the product was already returned to us 2 days ago. I apologize for this delay and make sure we send you the refund within 24 hours.")
+        goto(AnythingElse)
+    }
+}
+
+val RefundNotStarted = state(Interaction){
+    onEntry {
+        parallel{
+            goto(LookAround)
+        }
+        furhat.say("It seems like the product you returned has only just arrived today. The payment process has been set in motion and you will be refunded within 24 hours.")
+        goto(AnythingElse)
+    }
+}
+
+val RefundInMotion = state(Interaction){
+    onEntry {
+        parallel{
+            goto(LookAround)
+        }
+        furhat.ask("It looks like the product you returned has not arrived at our storage center yet. Did you mail it more than five days ago?")
+    }
+    onResponse<Yes> {
+        goto(RefundNotFixed)
+    }
+    onResponse<No> {
+        goto(RefundFixed)
     }
 }
 
@@ -534,42 +553,70 @@ val FeedbackRating = state(Interaction) {
         furhat.ask("That's great! Overall, how would you rate our previous conversation? Bad, ok, or good?")
     }
     onResponse<Bad> {
-        furhat.say("That's sad to hear, but I'm glad you want to give me some tips. What would you like to see differently next time?")
-        goto(Apologies)
+        goto(BadDoneDifferently)
     }
     onResponse<Ok> {
-        furhat.say ( "Ah I see, what could I have done differently so that you would have rated the conversation as good?"  )
-        goto(Apologies)
+        goto(OKDoneDifferently)
     }
     onResponse<Good> {
-        furhat.say ( "That's nice to hear. What did you like most about it?" )
+        goto(likeMost)
+    }
+}
+
+val BadDoneDifferently = state(Interaction){
+    onEntry {
+        furhat.ask("That's sad to hear, but I'm glad you want to give me some tips. What would you like to see differently next time?")
+    }
+    onResponse {
+        goto(AgreeAndPositive)
+    }
+}
+
+val OKDoneDifferently = state(Interaction){
+    onEntry {
+        furhat.ask("Ah I see, what could I have done differently so that you would have rated the conversation as good?" )
+    }
+    onResponse {
+        goto(AgreeAndPositive)
+    }
+}
+
+
+val likeMost = state(Interaction){
+    onEntry {
+        furhat.ask ( "That's nice to hear. What did you like most about it?" )
+    }
+    onResponse {
         goto(BetterNextTime)
     }
 }
 
 val BetterNextTime = state(Interaction){
     onEntry {
-        furhat.say("Thank you! Was there also anything that I could do better next time?")
+        furhat.ask("Thank you! Was there also anything that I could do better next time?")
+    }
+    onResponse {
         goto(TakeInAccount)
     }
 }
 
-val Apologies = state(Interaction) {
-    onEntry {
-        random(
-                { furhat.say("I am sorry to hear that.") },
-                { furhat.say("That is very inconvenient") },
-                { furhat.say("Our apologies.") }
-                )
-        goto(AgreeAndPositive)
-    }
-}
+//val Apologies = state(Interaction) {
+//    onEntry {
+//        random(
+//                { furhat.say("I am sorry to hear that.") },
+//                { furhat.say("That is very inconvenient") },
+//                { furhat.say("Our apologies.") }
+//                )
+//        goto(AgreeAndPositive)
+//    }
+//}
 
 val AgreeAndPositive = state(Interaction){
     onEntry {
         furhat.say("I completely agree. Thank you for pointing that out.")
-        furhat.say("Was there also something that you liked about our conversation?")
-        // TODO response when speaker is done
+        furhat.ask("Was there also something that you liked about our conversation?")
+    }
+    onResponse {
         goto(TakeInAccount)
     }
 }
