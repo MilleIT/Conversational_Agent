@@ -2,6 +2,8 @@ package furhatos.app.fruitseller.flow
 
 import furhatos.app.fruitseller.book
 import furhatos.app.fruitseller.nlu.*
+import furhatos.app.fruitseller.pythonLoc
+import furhatos.app.fruitseller.scriptPath
 /*
 import furhatos.app.fruitseller.order
 */
@@ -63,15 +65,15 @@ val LookAround = state(Interaction) {
 
 val RunPython = state(Interaction) {
     onEntry {
-        val pythonLoc = "C:\\Users\\Daan Goslinga\\AppData\\Local\\Programs\\Python\\Python36\\python" //must be location of python.exe for python 3.6.6
-        val command = listOf<String>(pythonLoc,"kotlinclient.py")
-        val path : File = File("C:\\Users\\Daan Goslinga\\Desktop\\Conversational_Agent\\src\\pythonsockets") // must be directory where eval_script.py is located
+        val loc = pythonLoc //must be location of python.exe for python 3.6.6
+        val command = listOf<String>(loc,"kotlinclient.py")
+        val path : File = File(scriptPath) // must be directory where kotlinclient.py is located
         println("Command: $command")
         //val process = Runtime.getRuntime().exec(command, null, path)
         val pb = ProcessBuilder(command)
         pb.directory(path)
         pb.redirectErrorStream(true)
-
+        
         //pb.inheritIO()
         val process = pb.start()
         //process.waitFor()
@@ -130,7 +132,7 @@ val Start = state(Interaction) {
         else { // TODO dit werkt nog niet nice
             furhat.say("Sorry I can only help you with the three problems mentioned before. Please call 030 310 49 99 for any other questions.")
         }
-        goto(NoRefund) }
+    }
 
     onResponse<WrongPackage> {
         // TODO SAVE THAT PACKAGE IS WRONG
@@ -159,9 +161,9 @@ val Problem = state(Interaction) {
         if (users.current.book.emotion == "unhappy") {
             furhat.say("I have also noticed that you are unhappy")
         }
-//        parallel{
-//            goto(LookQuestion)
-//        }
+        parallel{
+            goto(LookQuestion)
+        }
         furhat.ask("Do you want to tell me what happened?")
         furhat.attend(user = users.random)
     }
@@ -282,7 +284,12 @@ val LookForCause = state(Interaction) {
 
         }
         else if (users.current.book.problem == "Didn't receive a refund") {
-            goto(NoRefund)
+
+            random(
+                    {goto(RefundDelay)},
+                    {goto(RefundInMotion)},
+                    {goto(RefundNotStarted)}
+            )
         }
 
     }
@@ -378,7 +385,6 @@ val ContinueOrder = state(Interaction) {
         goto(DeliveryDate)
     }
 }
-
 
 val DeliveryDate = state(Interaction) {
     onEntry {
@@ -503,23 +509,39 @@ val NewOrder = state(Interaction) {
     }
 }
 
-val NoRefund = state(Interaction) {
+
+val RefundDelay = state(Interaction){
     onEntry {
-        parallel {
+        parallel{
             goto(LookAround)
         }
-        random (
-                { furhat.say("The refund should indeed have taken place, as the product was already returned to us 2 days ago. I apologize for this delay and make sure we send you the refund within 24 hours.")
-                    goto(AnythingElse) },
-                {furhat.say("It seems like the product you returned has only just arrived today. The payment process has been set in motion and you will be refunded within 24 hours.")
-                    goto(AnythingElse) },
-                {val overFiveDays = furhat.askYN("It looks like the product you returned has not arrived at our storage center yet. Did you mail it more than five days ago?")
-                    if (overFiveDays!!) {
-                        goto(RefundNotFixed)
-                    } else {
-                        goto(RefundFixed)
-                    } }
-        )
+        furhat.say("The refund should indeed have taken place, as the product was already returned to us 2 days ago. I apologize for this delay and make sure we send you the refund within 24 hours.")
+        goto(AnythingElse)
+    }
+}
+
+val RefundNotStarted = state(Interaction){
+    onEntry {
+        parallel{
+            goto(LookAround)
+        }
+        furhat.say("It seems like the product you returned has only just arrived today. The payment process has been set in motion and you will be refunded within 24 hours.")
+        goto(AnythingElse)
+    }
+}
+
+val RefundInMotion = state(Interaction){
+    onEntry {
+        parallel{
+            goto(LookAround)
+        }
+        furhat.ask("It looks like the product you returned has not arrived at our storage center yet. Did you mail it more than five days ago?")
+    }
+    onResponse<Yes> {
+        goto(RefundNotFixed)
+    }
+    onResponse<No> {
+        goto(RefundFixed)
     }
 }
 
@@ -615,29 +637,51 @@ val FeedbackRating = state(Interaction) {
     }
     onResponse<Bad> {
         furhat.gesture(Gestures.Shake(strength = 0.2), async = false)
-        furhat.say("That's sad to hear, but I'm glad you want to give me some tips.")
-        parallel {
-            goto(LookQuestion)
-        }
-        furhat.say("What would you like to see differently next time?")
-        goto(Apologies)
+        goto(BadDoneDifferently)
     }
     onResponse<Ok> {
         furhat.gesture(Gestures.Nod(strength = 0.2), async = true)
-        furhat.say ( "Ah I see.")
-        parallel {
-            goto(LookQuestion)
-        }
-        furhat.say("What could I have done differently so that you would have rated the conversation as good?"  )
-        goto(Apologies)
+        goto(OKDoneDifferently)
     }
     onResponse<Good> {
         furhat.gesture(Gestures.Nod(strength = 0.2), async = true)
-        furhat.say ( "That's nice to hear.")
+        goto(likeMost)
+    }
+}
+
+val BadDoneDifferently = state(Interaction){
+    onEntry {
         parallel {
             goto(LookQuestion)
         }
-        furhat.ask("What did you like most about it?" )
+        furhat.ask("That's sad to hear, but I'm glad you want to give me some tips. What would you like to see differently next time?")
+    }
+    onResponse {
+        goto(AgreeAndPositive)
+    }
+}
+
+val OKDoneDifferently = state(Interaction){
+    onEntry {
+        parallel {
+            goto(LookQuestion)
+        }
+        furhat.ask("Ah I see, what could I have done differently so that you would have rated the conversation as good?" )
+    }
+    onResponse {
+        goto(AgreeAndPositive)
+    }
+}
+
+
+val likeMost = state(Interaction){
+    onEntry {
+        parallel {
+            goto(LookQuestion)
+        }
+        furhat.ask ( "That's nice to hear. What did you like most about it?" )
+    }
+    onResponse {
         goto(BetterNextTime)
     }
 }
@@ -652,30 +696,29 @@ val BetterNextTime = state(Interaction){
             goto(LookQuestion)
         }
         furhat.ask("Was there also anything that I could do better next time?")
+    }
+    onResponse {
         goto(TakeInAccount)
     }
 }
 
-val Apologies = state(Interaction) {
-    onEntry {
-        furhat.ask("")
-    }
-
-    onResponse {
-        furhat.gesture(Gestures.Shake(strength = 0.2), async = false)
-        random(
-                { furhat.say("I am sorry to hear that.") },
-                { furhat.say("That is very inconvenient") },
-                { furhat.say("Our apologies.") }
-        )
-        goto(AgreeAndPositive) // TODO dit is heel gek hij gaat dan meteen nog iets zeggen
-    }
-}
+//val Apologies = state(Interaction) {
+//    onEntry {
+//        random(
+//                { furhat.say("I am sorry to hear that.") },
+//                { furhat.say("That is very inconvenient") },
+//                { furhat.say("Our apologies.") }
+//                )
+//        goto(AgreeAndPositive)
+//    }
+//}
 
 val AgreeAndPositive = state(Interaction){
     onEntry {
         furhat.gesture(Gestures.Nod(strength = 0.2), async = false)
         furhat.say("I completely agree. Thank you for pointing that out.")
+    }
+    onResponse {
         parallel {
             goto(LookQuestion)
         }

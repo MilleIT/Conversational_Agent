@@ -4,8 +4,8 @@ package furhatos.app.fruitseller
 import furhatos.app.fruitseller.nlu.FruitList
 */
 import furhatos.app.fruitseller.nlu.Days
+import furhatos.flow.kotlin.UserDataDelegate
 import furhatos.records.User
-import furhatos.records.Record
 import furhatos.nlu.common.Number
 
 class UserData (
