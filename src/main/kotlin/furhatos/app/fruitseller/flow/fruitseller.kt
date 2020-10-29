@@ -111,7 +111,6 @@ val Start = state(Interaction) {
         }
         furhat.gesture(Gestures.Thoughtful(strength = 0.2), async = true)
         furhat.ask("I can help when a package is late or lost, a wrong package is delivered, or a refund is not received.")
-        goto(NoRefund)
     }
 
     onReentry {
@@ -651,10 +650,12 @@ val FeedbackRating = state(Interaction) {
 
 val BadDoneDifferently = state(Interaction){
     onEntry {
+
+        furhat.say("That's sad to hear, but I'm glad you want to give me some tips.")
         parallel {
             goto(LookQuestion)
         }
-        furhat.ask("That's sad to hear, but I'm glad you want to give me some tips. What would you like to see differently next time?")
+        furhat.ask("What would you like to see differently next time?")
     }
     onResponse {
         goto(AgreeAndPositive)
@@ -663,10 +664,12 @@ val BadDoneDifferently = state(Interaction){
 
 val OKDoneDifferently = state(Interaction){
     onEntry {
+
+        furhat.say("Ah I see.")
         parallel {
             goto(LookQuestion)
         }
-        furhat.ask("Ah I see, what could I have done differently so that you would have rated the conversation as good?" )
+        furhat.ask("What could I have done differently so that you would have rated the conversation as good?" )
     }
     onResponse {
         goto(AgreeAndPositive)
@@ -676,10 +679,12 @@ val OKDoneDifferently = state(Interaction){
 
 val likeMost = state(Interaction){
     onEntry {
+
+        furhat.say ( "That's nice to hear.")
         parallel {
             goto(LookQuestion)
         }
-        furhat.ask ( "That's nice to hear. What did you like most about it?" )
+        furhat.ask("What did you like most about it?" )
     }
     onResponse {
         goto(BetterNextTime)
