@@ -114,7 +114,7 @@ class OrderNumber(var ordernumber : Number? = null) : Intent() {
 
 class Bad() : Intent() {
     override fun getExamples(lang: Language): List<String> {
-        return listOf("Bad", "Poor", "Disappointing", "Unsatisfactory", "Hopeless", "Unacceptable", "Shit", "Crap", "Sucked", "Useless", "Terrible", "Awful", "Miserable")
+        return listOf("Bad", "Bed", "Poor", "Disappointing", "Unsatisfactory", "Hopeless", "Unacceptable", "Shit", "Crap", "Sucked", "Useless", "Terrible", "Awful", "Miserable")
     }
 }
 
@@ -138,7 +138,7 @@ class Cancel() : Intent(){
 
 class StillReceive() : Intent(){
     override fun getExamples(lang: Language): List<String> {
-        return listOf("I would still like to receive my order")
+        return listOf("I would still like to receive my order", "I would like to receive my order", "I would like to receive my product")
     }
 }
 
