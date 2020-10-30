@@ -157,7 +157,7 @@ val Start = state(Interaction) {
     onResponse {
         nomatch++
         if (nomatch > 2)
-            furhat.say("Sorry, I can only help you with the three problems mentioned before. Please call 030 310 49 99 for any other questions.")
+            furhat.say("Sorry, I can only help you with the three specific problems mentioned before. Please call 030 310 49 99 for any other questions.")
         else if (nomatch > 1) {
             furhat.say("Sorry, I still didn't understand that.")
             reentry()
@@ -215,8 +215,8 @@ val Problem = state(Interaction) {
         if (users.current.book.emotion == "happy") {
             furhat.say ( "Despite all this you still look optimistic. I admire that." ) // todo oude tekst: Looking at your smile it luckily appears to me that you are not greatly impacted by this problem.
         } else if (users.current.book.emotion == "unhappy") {
-        furhat.say ( "I understand that this whole ordeal has made you quite unhappy." )
-    }
+            furhat.say ( "I understand that this whole ordeal has made you quite unhappy." )
+        }
         furhat.say("Let's fix this issue as soon as possible.") // todo oude tekst: "We'll fix this issue as soon as possible. I'll ask you some questions to make sure I have all necessary information."
         goto(OrderAndName)
     }
@@ -227,7 +227,10 @@ val OrderAndName = state(Interaction) {
         parallel {
             goto(LookQuestion) // TODO hij crashed hier heel soms en blijft vast zitten op de attend
         }
-        furhat.ask("Can I have your order number and first name?")
+        furhat.ask({random {
+            +"Can I have your order number and first name please?"
+            +"Would you like to share your order number and first name?"
+        }})
     }
 
     onResponse<OrderAndName> {
@@ -248,9 +251,11 @@ val OrderAndName = state(Interaction) {
                 furhat.say("I hope you'll enjoy the rest of your day!")
             }
             else if (users.current.book.emotion == "unhappy") {
-                furhat.say("I'm sure we'll fix it next time!")
+                furhat.say({random {
+                    +"I'm sure we'll fix it next time!"
+                    +"I'm sure we'll solve it next time!"
+                }})
             }
-
         }
     }
 }
@@ -266,11 +271,11 @@ val LookUpOrder = state(Interaction) {
         TimeUnit.SECONDS.sleep(2)
 
         if(random == 1) {
-            furhat.say("I can see here this is about the order of a 15 inch Dell laptop")
+            furhat.say("I can see here this is about the order of a 15 inch Dell laptop.")
             users.current.book.receivedOrder = "laptop"
         }
         else if(random == 2) {
-            furhat.say("I can see here this is about the order of a 70 inch LG Television")
+            furhat.say("I can see here this is about the order of a 70 inch LG Television.")
             users.current.book.receivedOrder = "television"
         }
         parallel {
@@ -329,15 +334,43 @@ val LookForCause = state(Interaction) {
 val TryOrderAgain = state(Interaction) {
     onEntry {
         furhat.attend(user = users.random)
-        furhat.ask("Let's try this again then. Can you repeat the order number? It can be found in the confirmation email of your order.")
+        furhat.say("Let's try this again.")
+        furhat.ask("Can you repeat the order number? It can be found in the confirmation email of your order.")
         furhat.attend(Loc())
     }
 
-    onResponse<No> { // TODO not an order number
-        reentry()
-    }
     onResponse<OrderNumber> {
         goto(FoundOrder)
+    }
+
+    onResponse<No> {
+        furhat.say("We do really need this information to continue.")
+        var noInformation = furhat.askYN("Are you sure you don't have this information right now and want to quit?")
+        if (noInformation!!) {
+            furhat.say("I'm sorry I couldn't solve it right away.")
+            furhat.say("Perhaps you can look up the order number and come back so I can help you fix this.")
+            if (users.current.book.emotion == "happy") {
+                furhat.say("I hope you'll enjoy the rest of your day!")
+            }
+            else if (users.current.book.emotion == "unhappy") {
+                furhat.say({random {
+                    +"I'm sure we'll fix it next time!"
+                    +"I'm sure we'll solve it next time!"
+                }})
+            }
+            reentry()
+        }
+        else {
+            reentry()
+        }
+    }
+
+    onResponse {
+        furhat.ask({random {
+            +"Perhaps I misunderstood, could you repeat that?"
+            +"I don't think I understood you, can you say it again?"
+            +"Sorry, I didn't understand you, could you repeat it?"
+        }})
     }
 
 }
