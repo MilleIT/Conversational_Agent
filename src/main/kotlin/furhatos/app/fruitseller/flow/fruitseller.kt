@@ -10,16 +10,11 @@ import furhatos.app.fruitseller.order
 import furhatos.flow.kotlin.*
 import furhatos.gestures.Gestures
 import furhatos.nlu.common.*
-import furhatos.nlu.common.Number
 import furhatos.records.Location
-import furhatos.util.Language
-import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
-import java.net.Inet4Address
 import java.util.*
 import java.util.concurrent.TimeUnit
-import java.util.stream.Collectors
 import kotlin.random.Random
 fun Loc(): Location {
     val x = Random.nextInt(-5,5)
@@ -249,7 +244,7 @@ val LookUpOrder = state(Interaction) {
             goto(LookAround)
         }
         TimeUnit.SECONDS.sleep(2)
-        furhat.say({
+        furhat.say {
             +"I can see here this is about the order of a"
             random {
                 block {
@@ -261,9 +256,9 @@ val LookUpOrder = state(Interaction) {
                     users.current.book.receivedOrder = "television"
                 }
             }
-        })
+        }
 
-            parallel {
+        parallel {
                 goto(LookQuestion)
             }
             furhat.ask("Is that right?")
@@ -343,12 +338,21 @@ val FoundOrder = state(Interaction) {
         furhat.say ( "Ok, let me check." )
         furhat.attend(Loc())
         TimeUnit.SECONDS.sleep(3)
-        furhat.say ( {+"Thank you for your patience, I have found your order, "
-        random{
-            + "the 13 inch HP laptop."
-            + "the 50 inch Phillips television"
+        furhat.say {
+            +"Thank you for your patience, I have found your order, "
+            random {
+
+                block {
+                    +"the 13 inch HP laptop."
+                    users.current.book.receivedOrder = "laptop"
+                }
+                block {
+                    +"the 50 inch Phillips television"
+                    users.current.book.receivedOrder = "television"
+                }
+
+            }
         }
-        }) // Moet hier order variable storen
        // TimeUnit.SECONDS.sleep(1) HEB DIT FF UITGECOMMENT, SNAP NIET WAAROM WE EEN SECONDE STILTE LATEN VALLEN
         goto(LookForCause)
     }
@@ -609,7 +613,7 @@ val RefundFixed = state(Interaction) {
         furhat.ask(" Would you like to be contacted via email, text message, or not at all?")
     }
 
-    onResponse<Yes> { // TODO change to email or text message
+    onResponse<EmailORText> {
         furhat.say("Alright, noted. We'll be in touch soon.")
         furhat.say("I sincerely hope the package will just arrive in no time and you do not need to put in any more effort than you already have.")
         goto(AnythingElse)
@@ -650,7 +654,7 @@ val AskForFeedback = state(Interaction) {
         if (users.current.book.emotion == "unhappy") {
             furhat.say("I've noticed you are unhappy. It would be great for me to know what caused this unhappiness.")
         } else if (users.current.book.emotion == "neutral") {
-            furhat.say("I have a hard time esimating your emotions")
+            furhat.say("I have a hard time estimating your emotions")
         } else if (users.current.book.emotion == "happy") {
             furhat.say("I've noticed you are happy. So it would be great if you told me what caused you to be happy.")
         }
