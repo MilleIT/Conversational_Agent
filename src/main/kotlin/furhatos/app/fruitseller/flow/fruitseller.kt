@@ -566,7 +566,7 @@ val RefundFixed = state(Interaction) {
         furhat.ask(" Would you like to be contacted via email, text message, or not at all?")
     }
 
-    onResponse<Yes> { // TODO change to email or text message
+    onResponse<EmailORText> {
         furhat.say("Alright, noted. We'll be in touch soon.")
         furhat.say("I sincerely hope the package will just arrive in no time and you do not need to put in any more effort than you already have.")
         goto(AnythingElse)
@@ -607,7 +607,7 @@ val AskForFeedback = state(Interaction) {
         if (users.current.book.emotion == "unhappy") {
             furhat.say("I've noticed you are unhappy. It would be great for me to know what caused this unhappiness.")
         } else if (users.current.book.emotion == "neutral") {
-            furhat.say("I have a hard time esimating your emotions")
+            furhat.say("I have a hard time estimating your emotions")
         } else if (users.current.book.emotion == "happy") {
             furhat.say("I've noticed you are happy. So it would be great if you told me what caused you to be happy.")
         }
