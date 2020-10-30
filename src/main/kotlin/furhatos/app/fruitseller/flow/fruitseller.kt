@@ -115,37 +115,34 @@ val Start = state(Interaction) {
 
     onReentry {
         furhat.attend(user = users.random)
-        furhat.say("Hello, I'm Furhat and I will be assisting you today. " +
-                "Could you tell me what problem you are experiencing? ")
+        random (
+                {furhat.ask("What problem are you experiencing?")},
+                {furhat.ask("How can I help you?")},
+                {furhat.ask("Could you repeat that please?")},
+                {furhat.ask("What did you mean exactly?")}
+        )
+        furhat.ask("What problem are you experiencing?")
         furhat.gesture(Gestures.Thoughtful, async = true)
-        val problem = furhat.ask("I can help when a package is late or lost, a wrong package is delivered, or refund is received.")
-        if (problem == "I got the wrong package") {
-            users.current.book.problem  = "got the wrong package"
-        }
-        else if (problem == "My package didn't arrive") {
-            users.current.book.problem  = "didn't receive package"
-        }
-        else if (problem == "I didn't receive my refund") {
-            users.current.book.problem  = "didn't receive refund"
-        }
-        else { // TODO dit werkt nog niet nice
-            furhat.say("Sorry I can only help you with the three problems mentioned before. Please call 030 310 49 99 for any other questions.")
-        }
+        // TODO dit werkt nog niet nice
+        // furhat.say("Sorry I can only help you with the three problems mentioned before. Please call 030 310 49 99 for any other questions.")
     }
 
     onResponse<WrongPackage> {
         // TODO SAVE THAT PACKAGE IS WRONG
-        users.current.book.problem = "Got the wrong package"
+        users.current.book.problem = "received the wrong package"
         goto(Problem)
 
     }
     onResponse<NoPackage> {
-        users.current.book.problem = "Didn't receive the package"
+        users.current.book.problem = "didn't receive the package"
         goto(Problem)
     }
     onResponse<NoRefund> {
-        users.current.book.problem = "Didn't receive a refund"
+        users.current.book.problem = "didn't receive a refund"
         goto(Problem)
+    }
+    onNoResponse {
+        furhat.say("Sorry I didn't hear you.")
     }
 }
 
@@ -272,17 +269,17 @@ val LookForCause = state(Interaction) {
         furhat.attend(user = users.random)
 
         // TODO dit is beetje warrig geprogameerd. Ene keer is random in deze val, andere keer na goto
-        if(users.current.book.problem == "Got the wrong package") {
+        if(users.current.book.problem == "received the wrong package") {
             goto(WrongPackage)
         }
-        else if (users.current.book.problem == "Didn't receive the package") {
+        else if (users.current.book.problem == "didn't receive the package") {
             random (
                     {goto(NotSentYet) },
                     {goto(OnItsWay) }
             )
 
         }
-        else if (users.current.book.problem == "Didn't receive a refund") {
+        else if (users.current.book.problem == "didn't receive a refund") {
 
             random(
                     {goto(RefundDelay)},

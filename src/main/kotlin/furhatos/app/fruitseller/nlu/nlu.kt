@@ -84,19 +84,19 @@ class NoDay() : Intent() {
 
 class WrongPackage() : Intent() {
     override fun getExamples(lang: Language): List<String> {
-        return listOf("I got the wrong package")
+        return listOf("I got the wrong package", "Wrong package", "Wrong package delivered", "I received the wrong package")
     }
 }
 
 class NoPackage() : Intent() {
     override fun getExamples(lang: Language): List<String> {
-        return listOf("My package didn't arrive", "I didn't receive my package")
+        return listOf("My package didn't arrive", "I didn't receive my package", "No package received", "No package", "I didn't receive the package")
     }
 }
 
 class NoRefund() : Intent() {
     override fun getExamples(lang: Language): List<String> {
-        return listOf("I didn't receive my refund")
+        return listOf("I didn't receive my refund", "No refund", "No refund received", "I'm not refunded", "I didn't receive a refund")
     }
 }
 
