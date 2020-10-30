@@ -96,13 +96,13 @@ val Start = state(Interaction) {
             goto(RunPython)
         }
         furhat.attend(user = users.random)
-        furhat.say("Welcome to the live support of Bol.com. My name is Furhat and I will be assisting you today. ")
+        furhat.say("Hello! Welcome to the live support of Bol.com. My name is Furhat and I will be assisting you today. ")
         parallel {
-            goto (LookQuestion)
+            goto (LookAround)
         }
         furhat.say("I can help when a package is late or lost, a wrong package is delivered, or a refund is not received.")
         parallel {
-            goto (LookAround)
+            goto (LookQuestion)
         }
         furhat.gesture(Gestures.Thoughtful(strength = 0.2), async = true)
         furhat.ask("Could you tell me what problem you are experiencing?")
@@ -344,9 +344,15 @@ val FoundOrder = state(Interaction) {
 
 val OnItsWay = state(Interaction){
     onEntry {
-        furhat.say("It looks like your package is on it's way and will be delivered")
-        furhat.gesture(Gestures.CloseEyes(strength = 0.5)) // TODO check of dit beetje nice is
-        furhat.ask(" within two days. We are sorry for the delay. As compensation I will send you a 20% discount coupon for your next order.")
+        parallel {
+            goto(LookQuestion)
+        }
+        furhat.say("It looks like your package is on it's way and will be delivered within two days.")
+        furhat.gesture(Gestures.Shake(strength = 0.5), async = true)
+        furhat.gesture(Gestures.CloseEyes, async = true)
+        furhat.say("We are sorry for the delay.")
+        furhat.gesture(Gestures.OpenEyes, async = true)
+        furhat.ask("As compensation I will send you a 20% discount coupon for your next order.")
     }
     onResponse<TooLate> {
         goto(ReturnPackage)
@@ -491,8 +497,11 @@ val IntendedOrder = state(Interaction) {
 
 val CantHelp = state(Interaction) {
     onEntry {
-        furhat.say("Then I'm not sure how I can help with your problem. Please search " +
-                "for human support at our website. I hope you find your solution there!")
+        furhat.gesture(Gestures.CloseEyes, async = true)
+        furhat.gesture(Gestures.Shake( strength = 0.5), async = true)
+        furhat.say("Then I can't help you.")
+        furhat.gesture(Gestures.OpenEyes, async = true)
+        furhat.say(" Please search for human support at our website. I hope you find your solution there!")
         goto(AnythingElse)
     }
 }
@@ -505,8 +514,11 @@ val NewOrder = state(Interaction) {
             ". I've also added free priority shipping to compensate for the receivement of a wrong package.")
         furhat.gesture(Gestures.BigSmile, async = true)
         furhat.gesture(Gestures.Wink(duration = 2.0), async = false)
-        furhat.ask(" When we deliver the new order we'll take the wrongly received " + users.current.book.receivedOrder +
-                " with us. Could you tell me which day this week you'll be at home after 5 pm?" )
+        furhat.say(" When we deliver the new order we'll take the wrongly received " + users.current.book.receivedOrder + "with us.")
+        parallel{
+            goto(LookQuestion)
+        }
+        furhat.ask("Could you tell me which day this week you'll be at home after 5 pm?" )
     }
 
     onResponse<AvailableDays> {
