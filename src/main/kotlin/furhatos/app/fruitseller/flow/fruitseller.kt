@@ -735,28 +735,16 @@ val BetterNextTime = state(Interaction){
     }
 }
 
-//val Apologies = state(Interaction) {
-//    onEntry {
-//        random(
-//                { furhat.say("I am sorry to hear that.") },
-//                { furhat.say("That is very inconvenient") },
-//                { furhat.say("Our apologies.") }
-//                )
-//        goto(AgreeAndPositive)
-//    }
-//}
-
 val AgreeAndPositive = state(Interaction){
     onEntry {
         furhat.gesture(Gestures.Nod(strength = 0.2), async = false)
         furhat.say("I completely agree. Thank you for pointing that out.")
-    }
-    onResponse {
         parallel {
             goto(LookQuestion)
         }
-        furhat.say("Was there also something that you liked about our conversation?")
-        // TODO response when speaker is done
+        furhat.ask("Was there also something that you liked about our conversation?")
+    }
+    onResponse {
         goto(TakeInAccount)
     }
 }
