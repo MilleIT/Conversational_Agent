@@ -96,26 +96,26 @@ val Start = state(Interaction) {
             goto(RunPython)
         }
         furhat.attend(user = users.random)
-        furhat.say("Hello, welcome to the live support of Bol.com. My name is Furhat and I will be assisting you today. ")
+        furhat.say("Welcome to the live support of Bol.com. My name is Furhat and I will be assisting you today. ")
         parallel {
             goto (LookQuestion)
         }
-        furhat.say("Could you tell me what problem you are experiencing? ")
+        furhat.say("I can help when a package is late or lost, a wrong package is delivered, or a refund is not received.")
         parallel {
             goto (LookAround)
         }
         furhat.gesture(Gestures.Thoughtful(strength = 0.2), async = true)
-        furhat.ask("I can help when a package is late or lost, a wrong package is delivered, or a refund is not received.")
+        furhat.ask("Could you tell me what problem you are experiencing?")
     }
 
     onReentry {
         furhat.attend(user = users.random)
-        random (
-                {furhat.ask("What problem are you experiencing?")},
-                {furhat.ask("How can I help you?")},
-                {furhat.ask("Could you repeat that please?")},
-                {furhat.ask("What did you mean exactly?")}
-        )
+        furhat.ask({random {
+            +"What problem are you experiencing?"
+            +"How can I help you?"
+            +"Could you repeat that please?"
+            +"What did you mean exactly?"
+        }})
         furhat.ask("What problem are you experiencing?")
         furhat.gesture(Gestures.Thoughtful, async = true)
         // TODO dit werkt nog niet nice
@@ -136,8 +136,39 @@ val Start = state(Interaction) {
         users.current.book.problem = "didn't receive a refund"
         goto(Problem)
     }
+
+    var noresponse = 0
     onNoResponse {
-        furhat.say("Sorry I didn't hear you.")
+        noresponse++
+        if (noresponse > 3)
+            furhat.say("Perhaps another time is better. You can contact me 24/7.")
+        else if (noresponse > 2) {
+            furhat.say("Are you still there?")
+            reentry()
+        }
+        else if (noresponse > 1) {
+            furhat.say("Sorry, I still didn't hear you.")
+            reentry()
+        }
+        else {
+            furhat.say("Sorry, I didn't hear you.")
+            reentry()
+        }
+    }
+
+    var nomatch = 0
+    onResponse {
+        nomatch++
+        if (nomatch > 2)
+            furhat.say("Sorry, I can only help you with the three problems mentioned before. Please call 030 310 49 99 for any other questions.")
+        else if (nomatch > 1) {
+            furhat.say("Sorry, I still didn't understand that.")
+            reentry()
+        }
+        else {
+            furhat.say("Sorry, I didn't understand that.")
+            reentry()
+        }
     }
 }
 
