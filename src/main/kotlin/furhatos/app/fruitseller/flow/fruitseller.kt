@@ -10,13 +10,13 @@ import furhatos.app.fruitseller.order
 import furhatos.flow.kotlin.*
 import furhatos.gestures.Gestures
 import furhatos.nlu.common.*
+import furhatos.nlu.common.Date
 import furhatos.records.Location
 import java.io.File
 import java.io.InputStreamReader
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
-
 fun Loc(): Location {
     val x = Random.nextInt(-5,5)
     val y = Random.nextInt(-1,5)
@@ -59,12 +59,6 @@ val LookAround = state(Interaction) {
 
 }
 
-val MockEmotion = state(Interaction) {
-    onEntry {
-        users.current.book.emotion = "unhappy"
-    }
-}
-
 val RunPython = state(Interaction) {
     onEntry {
         val loc = pythonLoc //must be location of python.exe for python 3.6.6
@@ -101,10 +95,9 @@ val Start = state(Interaction) {
     onEntry {
         parallel {
             goto(RunPython)
-            //goto(MockEmotion)
         }
         furhat.attend(user = users.random)
-        furhat.say("Welcome to the live support of Bol.com. My name is Furhat and I will be assisting you today. ")
+        furhat.say("Hello! Welcome to the live support of Bol.com. My name is Furhat and I will be assisting you today. ")
         parallel {
             goto (LookAround)
         }
@@ -192,35 +185,8 @@ val Problem = state(Interaction) {
             goto(LookQuestion)
         }
         furhat.attend(user = users.random)
-        furhat.ask("Do you want to tell me what happened?")
+        furhat.ask("Do you want to tell me what happened?", endSil = 6000, maxSpeech = 60000)
     }
-
-    onResponse<No> {
-        furhat.gesture(Gestures.Nod(strength = 0.5));
-        furhat.say("That's alright, let's focus on fixing this issue immediately.")
-        if (users.current.book.emotion == "unhappy") {
-            furhat.say("I'll do my utmost best for you.") // todo oude tekst:  hope you won't be unhappy anymore if we get this issue out of the way quickly
-        }
-        goto(OrderAndName)
-    }
-
-    onResponse<Yes> {
-        furhat.gesture(Gestures.Nod(strength = 0.5));
-        furhat.say("Please do tell me, I'm listening.")
-        goto(TellWhatHappened)
-    }
-
-    onResponse {
-        furhat.gesture(Gestures.Nod(strength = 0.5));
-        goto(TellWhatHappened)
-    }
-}
-
-val TellWhatHappened = state(Interaction) {
-    onEntry {
-        furhat.listen(endSil = 8000)
-    }
-
     onInterimResponse(endSil = 2000) {
         val random = Random.nextInt(5) + 1
         if (random == 1 )
@@ -233,11 +199,20 @@ val TellWhatHappened = state(Interaction) {
             furhat.say("Right", async = true)
         else
             furhat.gesture(Gestures.Nod)
-        furhat.listen(endSil = 8000, timeout = 3000)
+    }
+
+    onResponse<No> {
+        furhat.gesture(Gestures.Nod(strength = 0.5));
+        furhat.say("That's alright, let's focus on fixing this issue immediately.")
+        if (users.current.book.emotion == "unhappy") {
+            furhat.say("I'll do my utmost best for you.") // todo oude tekst:  hope you won't be unhappy anymore if we get this issue out of the way quickly
+        }
+        goto(OrderAndName)
     }
 
     onResponse {
-        furhat.say("This is unfortunate indeed. I'm sorry this happened.") // todo oude tekst: "This is indeed not the service we would have wanted to provide you with. I'm sorry this happened."
+        furhat.say("This is indeed not the service we would have wanted to " +
+                "provide you with. I'm sorry this happened.")
         if (users.current.book.emotion == "happy") {
             furhat.say ( "Despite all this you still look optimistic. I admire that." ) // todo oude tekst: Looking at your smile it luckily appears to me that you are not greatly impacted by this problem.
         } else if (users.current.book.emotion == "unhappy") {
@@ -577,7 +552,7 @@ val CantHelp = state(Interaction) {
     onEntry {
         furhat.gesture(Gestures.CloseEyes, async = true)
         furhat.gesture(Gestures.Shake( strength = 0.5), async = true)
-        furhat.say("Then I can't help you.")
+        furhat.say("Then I'm not sure how I can help with your problem.")
         furhat.gesture(Gestures.OpenEyes, async = true)
         furhat.say(" Please search for human support at our website. I hope you find your solution there!")
         goto(AnythingElse)
@@ -596,24 +571,29 @@ val NewOrder = state(Interaction) {
         parallel{
             goto(LookQuestion)
         }
-        furhat.ask("Could you tell me which day this week you'll be at home after 5 pm?" )
+        furhat.ask("Is there a day this week you are home before 5 pm?")
     }
-
-    onResponse<AvailableDays> {
-        furhat.say ("Excellent, I have send a confirmation mail to the same email as your previous order." +
-                " We'll see you on "+ users.current.book.days )
-        goto(AskForFeedback)
-    }
-
-    onResponse({listOf(NoDay(), No())}) {
+    onResponse<No> {
         furhat.say ("That's ok, since free retour lasts 30 days there is still time left to return the " +
                 users.current.book.receivedOrder +
                 ". You can either make a return appointment at our website or keep the item." +
                 " Please note that if you keep the item, we can not offer a refund." )
         goto(AskForFeedback)
     }
+    onResponse<Yes> {
+        goto(WhatDay)
+    }
 }
 
+val WhatDay = state(Interaction){
+    onEntry {
+        val day = furhat.askFor<Days>("Which day would you like the package to be picked up?" )
+        users.current.book.days  = day?.value
+        furhat.say ("Excellent, I have send a confirmation mail to the same email as your previous order." +
+                " We'll see you on "+ users.current.book.days )
+        goto(AskForFeedback)
+    }
+}
 
 val RefundDelay = state(Interaction){
     onEntry {

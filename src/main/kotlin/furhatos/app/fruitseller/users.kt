@@ -15,7 +15,7 @@ class UserData (
         var emotion: String? = null,
         var intendedOrder: String? = null,
         var receivedOrder: String? = null,
-        var days : Days? = null
+        var days : String? = null
 )
 
 val User.book : UserData
