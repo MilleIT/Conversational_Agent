@@ -165,9 +165,10 @@ val Start = state(Interaction) {
     onResponse {
         nomatch++
         if (nomatch > 2)
-            furhat.say("Sorry, I can only help you with the three specific problems mentioned before. Please call 030 310 49 99 for any other questions.")
+            furhat.say("Sorry, I can only help you with these three specific problems. Please call 030 310 49 99 for any other questions.")
         else if (nomatch > 1) {
-            furhat.say("Sorry, I still didn't understand that.")
+            furhat.say("Sorry, I still didn't understand that. I can help when a package didn't arrive, " +
+                    "you received the wrong package, or didn't receive a refund. ")
             reentry()
         }
         else {
@@ -294,7 +295,7 @@ val LookUpOrder = state(Interaction) {
         parallel {
             goto(LookAround)
         }
-        TimeUnit.SECONDS.sleep(2)
+        TimeUnit.SECONDS.sleep(3)
 
         if(random == 1) {
             furhat.say("I can see here this is about the order of a 15 inch Dell laptop.")
@@ -324,22 +325,25 @@ val LookForCause = state(Interaction) {
         furhat.gesture(Gestures.Smile, async = true)
         furhat.say("Alright then, now please give me a moment to retrieve the relevant data we have on this.")
         furhat.attend(Loc())
+        furhat.attend(user = users.random)
+        furhat.say("While I'm looking for the data, I've noticed you are looking " + users.current.book.emotion + "")
+        if (users.current.book.emotion == "unhappy") {
+           furhat.say("I understand this really is frustrating.")
+            var alright = furhat.askYN("Are you doing alright?")
+            if (alright!!) {
+                furhat.say("Good to hear you're holding up. I'll try to fix the issue as fast as possible. " +
+                        "It will probably not take more than five minutes")
+            } else {
+                furhat.say("I'm sorry, I'll try to fix the issue as fast as possible. " +
+                        "It will probably not take more than five minutes.")
+            }
+        } else if (users.current.book.emotion == "neutral") {
+            furhat.say( "I hope you are satisfied with our support. Let's quickly finish this up." ) // oude tekst: "I'm glad you are not very upset about the issue you are experiencing. Let's quickly finish this up."
+        } else if (users.current.book.emotion == "happy") {
+            furhat.say( "I'm glad you are too upset about the issue. Let's quickly finish this up.") // oude tekst: I'm glad you are satisfied with our support. Let's quickly finish this up and solve your issue.
+        }
         TimeUnit.SECONDS.sleep(2)
         furhat.attend(user = users.random)
-        // TODO check emotion
-        furhat.say("While I'm looking for the data, I've noticed you are " + users.current.book.emotion +
-                    " about this situation.")
-        if (users.current.book.emotion == "unhappy") {
-           furhat.say("I understand why you are unhappy and I'll try to fix the issue as fast as possible." +
-           "It will probably not take more than 5 minutes.")
-        } else if (users.current.book.emotion == "neutral") {
-            furhat.say( "I'm glad you are not very upset about the issue you are experiencing. Let's quickly finish this up." )
-        } else if (users.current.book.emotion == "happy") {
-            furhat.say( "I'm glad you are satisfied with our support. Let's quickly finish this up and solve your issue.")
-        }
-
-        furhat.attend(user = users.random)
-
         if(users.current.book.problem == "received the wrong package") {
             goto(WrongPackage)
         }
