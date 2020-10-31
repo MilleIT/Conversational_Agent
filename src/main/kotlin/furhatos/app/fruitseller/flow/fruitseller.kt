@@ -500,7 +500,7 @@ val CantHelp = state(Interaction) {
     onEntry {
         furhat.gesture(Gestures.CloseEyes, async = true)
         furhat.gesture(Gestures.Shake( strength = 0.5), async = true)
-        furhat.say("Then I can't help you.")
+        furhat.say("Then I'm not sure how I can help with your problem.")
         furhat.gesture(Gestures.OpenEyes, async = true)
         furhat.say(" Please search for human support at our website. I hope you find your solution there!")
         goto(AnythingElse)
@@ -519,32 +519,29 @@ val NewOrder = state(Interaction) {
         parallel{
             goto(LookQuestion)
         }
-
-        val day = furhat.askFor<Days>("Could you tell me which day this week you'll be at home after 5 pm?" )
-
-        users.current.book.days  = day?.value
-        furhat.say ("Excellent, I have send a confirmation mail to the same email as your previous order." +
-                " We'll see you on "+ users.current.book.days )
-        goto(AskForFeedback)
-
-//        furhat.ask("Could you tell me which day this week you'll be at home after 5 pm?" )
+        furhat.ask("Is there a day this week you are home before 5 pm?")
     }
-
-    onResponse<AvailableDays> {
-        furhat.say ("Excellent, I have send a confirmation mail to the same email as your previous order." +
-                " We'll see you on "+ users.current.book.days )
-        goto(AskForFeedback)
-    }
-
-    onResponse<NoDay> {
+    onResponse<No> {
         furhat.say ("That's ok, since free retour lasts 30 days there is still time left to return the " +
                 users.current.book.receivedOrder +
                 ". You can either make a return appointment at our website or keep the item." +
                 " Please note that if you keep the item, we can not offer a refund." )
         goto(AskForFeedback)
     }
+    onResponse<Yes> {
+        goto(WhatDay)
+    }
 }
 
+val WhatDay = state(Interaction){
+    onEntry {
+        val day = furhat.askFor<Days>("Which day would you like the package to be picked up?" )
+        users.current.book.days  = day?.value
+        furhat.say ("Excellent, I have send a confirmation mail to the same email as your previous order." +
+                " We'll see you on "+ users.current.book.days )
+        goto(AskForFeedback)
+    }
+}
 
 val RefundDelay = state(Interaction){
     onEntry {
