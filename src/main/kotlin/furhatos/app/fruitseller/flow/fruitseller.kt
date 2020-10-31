@@ -523,7 +523,9 @@ val NewOrder = state(Interaction) {
         val day = furhat.askFor<Days>("Could you tell me which day this week you'll be at home after 5 pm?" )
 
         users.current.book.days  = day?.value
-
+        furhat.say ("Excellent, I have send a confirmation mail to the same email as your previous order." +
+                " We'll see you on "+ users.current.book.days )
+        goto(AskForFeedback)
 
 //        furhat.ask("Could you tell me which day this week you'll be at home after 5 pm?" )
     }
