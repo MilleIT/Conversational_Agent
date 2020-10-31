@@ -10,6 +10,7 @@ import furhatos.app.fruitseller.order
 import furhatos.flow.kotlin.*
 import furhatos.gestures.Gestures
 import furhatos.nlu.common.*
+import furhatos.nlu.common.Date
 import furhatos.records.Location
 import java.io.File
 import java.io.InputStreamReader
@@ -518,7 +519,13 @@ val NewOrder = state(Interaction) {
         parallel{
             goto(LookQuestion)
         }
-        furhat.ask("Could you tell me which day this week you'll be at home after 5 pm?" )
+
+        val day = furhat.askFor<Days>("Could you tell me which day this week you'll be at home after 5 pm?" )
+
+        users.current.book.days  = day?.value
+
+
+//        furhat.ask("Could you tell me which day this week you'll be at home after 5 pm?" )
     }
 
     onResponse<AvailableDays> {
