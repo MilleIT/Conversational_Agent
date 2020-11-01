@@ -91,6 +91,7 @@ val RunPython = state(Interaction) {
 //            println("message: " + message)
         while (reader.hasNextLine()) {
             println(reader.nextLine())
+            users.current.book.emotion = reader.nextLine()
         }
         process.waitFor()
     }
