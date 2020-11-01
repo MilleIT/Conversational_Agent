@@ -90,7 +90,9 @@ val RunPython = state(Interaction) {
 //            var message = reader.lines().collect(Collectors.joining("\n"))
 //            println("message: " + message)
         while (reader.hasNextLine()) {
-            println(reader.nextLine())
+            var latestEmotion = reader.nextLine()
+            println(latestEmotion)
+            users.current.book.emotion = latestEmotion
         }
         process.waitFor()
     }
