@@ -104,7 +104,7 @@ val Start = state(Interaction) {
             //goto(MockEmotion)
         }
         furhat.attend(user = users.random)
-        furhat.say("Welcome to the live support of Bol.com. My name is Furhat and I will be assisting you today. ")
+        furhat.say("Hello! Welcome to the live support of Bol.com. My name is Furhat and I will be assisting you today. ")
         parallel {
             goto (LookAround)
         }
@@ -434,7 +434,7 @@ val OnItsWay = state(Interaction){
         furhat.gesture(Gestures.CloseEyes, async = true)
         furhat.say("We are sorry for the delay.")
         furhat.gesture(Gestures.OpenEyes, async = true)
-        furhat.ask("As compensation I will send you a 20% discount coupon for your next order.")
+        furhat.ask("As compensation I will send you a 20% discount coupon for your next order.") // TODO DIT IS VAAG, wacht op antwoord maar dat is voor user niet logisch
     }
     onResponse<TooLate> {
         goto(ReturnPackage)
