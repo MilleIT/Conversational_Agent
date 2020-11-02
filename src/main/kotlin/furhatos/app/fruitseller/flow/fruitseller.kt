@@ -437,24 +437,38 @@ val OnItsWay = state(Interaction){
         parallel {
             goto(LookQuestion)
         }
-        furhat.say("It looks like your package is on it's way and will be delivered within two days.")
+        furhat.say("It looks like your package is on its way and will be delivered within two days.")
         furhat.gesture(Gestures.Shake(strength = 0.5), async = true)
         furhat.gesture(Gestures.CloseEyes, async = true)
         furhat.say("We are sorry for the delay.")
         furhat.gesture(Gestures.OpenEyes, async = true)
-        furhat.ask("As compensation I will send you a 20% discount coupon for your next order.") // TODO DIT IS VAAG, wacht op antwoord maar dat is voor user niet logisch
+        furhat.say("As compensation I can send you a 20% discount coupon for your next order.")
+        furhat.ask("Would you want that or do you prefer to return the order?")
     }
     onResponse<TooLate> {
         goto(ReturnPackage)
     }
     onResponse<Confirm> {
+        furhat.say("Noted, I hope you can still enjoy the product even though it arrives late.")
+        furhat.say("You will receive the discount in your email today.")
         goto(AnythingElse)
+    }
+    onResponse<No> {
+        var returnPackage = furhat.askYN(",I'm sorry. I understand you would like to have it returned?")
+        if (returnPackage!!)
+            goto(ReturnPackage)
+        else {
+            furhat.say("Ah I misunderstood, I hope you can still enjoy the product even though it arrives late.")
+            furhat.say("You will receive the discount in your email today.")
+            goto(AnythingElse)
+        }
     }
 }
 
 val ReturnPackage = state(Interaction){
     onEntry {
-        furhat.say ( "I am sorry to hear that. I send you a coupon you can use to have the product" +
+        furhat.say ( "I am sorry to hear that.")
+        furhat.say ( "I will send you a link via email you can use to have the product" +
                 " returned and picked up from your home for free. On our website you can choose when " +
                 "you would like the product to be picked up." )
         goto(AnythingElse)
