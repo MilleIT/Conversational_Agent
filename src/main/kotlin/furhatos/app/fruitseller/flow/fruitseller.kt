@@ -750,14 +750,14 @@ val AnythingElse = state(Interaction) {
 
     onResponse<Yes> {
         parallel {
-            goto(RunPython) //Is dit de bedoeling
+            goto(RunPython) // todo Is dit de bedoeling
         }
         if (users.current.book.emotion == "Unhappy") {
             furhat.say("I'm sorry you are still unhappy with the whole situation")
         } else if (users.current.book.emotion == "Happy") {
             furhat.say("I'm glad that I could be of service and it appears to me that you are satisfied with my support")
         }
-        furhat.say("I think that one of my collegues can be of better help, I'll put you through.")
+        furhat.say("I think that one of my colleagues can be of better help, I'll put you through.")
     }
 
     onResponse<No> {
@@ -771,11 +771,11 @@ val AskForFeedback = state(Interaction) {
             goto(RunPython) //Is dit de bedoeling
         }
         if (users.current.book.emotion == "Unhappy") {
-            furhat.say("I've noticed you are unhappy. It would be great for me to know what caused this unhappiness.")
+            furhat.say("I've noticed you are unhappy. Can I know what caused this unhappiness.")
         } else if (users.current.book.emotion == "Neutral") {
-            furhat.say("I have a hard time estimating your emotions")
+            furhat.say("I had a hard time estimating your emotions.")
         } else if (users.current.book.emotion == "Happy") {
-            furhat.say("I've noticed you are happy. So it would be great if you told me what caused you to be happy.")
+            furhat.say("I've noticed you are happy. It would be great if you told me what caused you to be happy.")
         }
         var givesFeedback = furhat.askYN("As you know I'm a bot that is ever improving. Would you be willing to give me " +
                 "some tips so that I can provide you with a better service in the future?")
