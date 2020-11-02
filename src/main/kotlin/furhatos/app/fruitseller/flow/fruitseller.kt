@@ -450,7 +450,7 @@ val OnItsWay = state(Interaction){
     }
     onResponse<Confirm> {
         furhat.say("Noted, I hope you can still enjoy the product even though it arrives late.")
-        furhat.say("You will receive the discount in your email today.")
+        furhat.say("You will receive the discount in your e-mail today.")
         goto(AnythingElse)
     }
     onResponse<No> {
@@ -459,7 +459,7 @@ val OnItsWay = state(Interaction){
             goto(ReturnPackage)
         else {
             furhat.say("Ah I misunderstood, I hope you can still enjoy the product even though it arrives late.")
-            furhat.say("You will receive the discount in your email today.")
+            furhat.say("You will receive the discount in your e-mail today.")
             goto(AnythingElse)
         }
     }
@@ -536,7 +536,7 @@ val WrongPackage = state(Interaction) {
             goto(LookQuestion)
         }
         furhat.ask(" could you tell me what you intended to order? " +
-                    "Please note that the only items we sell are laptops, Tv's, Playstations and headphones." )
+                    "Please note that the only items we sell are laptops, TVs, Playstations, and headphones." )
         }
     onResponse<Headphones> {
         users.current.book.intendedOrder = "headphone"
@@ -587,7 +587,7 @@ val SameOrder = state(Interaction){
 val IntendedOrder = state(Interaction) {
     onEntry {
         furhat.ask("What did you intend to order? Please note that the only " +
-                "items we sell are laptops, Tv's, Playstations and headphones.")
+                "items we sell are laptops, TVs, Playstations, and headphones.")
     }
     onResponse<Headphones> {
         users.current.book.intendedOrder = "headphone"
@@ -623,20 +623,20 @@ val NewOrder = state(Interaction) {
     onEntry {
         furhat.gesture(Gestures.Nod(strength = 0.5), async = true)
         furhat.say ("Ok, I made a new order for you for a " + users.current.book.intendedOrder +
-            ". I've also added free priority shipping to compensate for the receivement of a wrong package.")
+            ". I've also added free priority shipping to compensate for this error.")
         furhat.gesture(Gestures.BigSmile, async = true)
         furhat.gesture(Gestures.Wink(duration = 2.0), async = false)
         furhat.say(" When we deliver the new order we'll take the wrongly received " + users.current.book.receivedOrder + "with us.")
         parallel{
             goto(LookQuestion)
         }
-        furhat.ask("Is there a day this week you are home before 5 pm?")
+        furhat.ask("Is there a day this week you are home before 5 p.m.?")
     }
     onResponse({listOf(NoDay(), No())}) {
         furhat.say ("That's ok, since free retour lasts 30 days there is still time left to return the " +
-                users.current.book.receivedOrder +
-                ". You can either make a return appointment at our website or keep the item." +
-                " Please note that if you keep the item, we can not offer a refund." )
+                users.current.book.receivedOrder + "." )
+        furhat.say("You can either make a return appointment on our website or keep the item. " +
+                "Please note that if you keep the item, we can not offer a refund.")
         goto(AskForFeedback)
     }
     onResponse<Yes> {
@@ -648,8 +648,8 @@ val WhatDay = state(Interaction){
     onEntry {
         val day = furhat.askFor<Days>("Which day would you like the package to be picked up?" )
         users.current.book.days  = day?.value
-        furhat.say ("Excellent, I have send a confirmation e-mail to the same email as your previous order." +
-                " We'll see you on "+ users.current.book.days )
+        furhat.say ("Excellent, I have send a confirmation e-mail to the same e-mail as your previous order.")
+        furhat.say("We'll see you on " + users.current.book.days + ".")
         goto(AskForFeedback)
     }
 }
@@ -699,7 +699,7 @@ val RefundNotFixed = state(Interaction) {
         }
         val hasCopy = furhat.askYN("Do you still have the proof of shipment?")
         if (hasCopy!!) {
-            furhat.say("That's good to hear! If you could send an email to helpdesk@bol.com with a picture or scan " +
+            furhat.say("That's good to hear! If you could send an e-mail to helpdesk@bol.com with a picture or scan " +
                     "of the proof of shipment, it will all be sorted out.")
             furhat.say("We'll reply to you within 6 hours and then the refund will be processed within 24 hours.")
             furhat.say("I apologize for the delay and extra effort this requested from you.")
@@ -721,7 +721,7 @@ val RefundFixed = state(Interaction) {
         parallel {
             goto(LookQuestion)
         }
-        furhat.ask(" Would you like to be contacted via email, text message, or not at all?")
+        furhat.ask(" Would you like to be contacted via e-mail, text message, or not at all?")
     }
 
     onResponse<EmailOrText> {
