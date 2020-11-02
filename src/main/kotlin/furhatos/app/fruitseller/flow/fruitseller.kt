@@ -370,7 +370,7 @@ val TryOrderAgain = state(Interaction) {
     onEntry {
         furhat.attend(user = users.random)
         furhat.say("Let's try this again.")
-        furhat.ask("Can you repeat the order number? It can be found in the confirmation email of your order.")
+        furhat.ask("Can you repeat the order number? It can be found in the confirmation e-mail of your order.")
         furhat.attend(Loc())
     }
 
@@ -468,7 +468,7 @@ val OnItsWay = state(Interaction){
 val ReturnPackage = state(Interaction){
     onEntry {
         furhat.say ( "I am sorry to hear that.")
-        furhat.say ( "I will send you a link via email you can use to have the product" +
+        furhat.say ( "I will send you a link via e-mail you can use to have the product" +
                 " returned and picked up from your home for free. On our website you can choose when " +
                 "you would like the product to be picked up." )
         goto(AnythingElse)
@@ -478,7 +478,7 @@ val ReturnPackage = state(Interaction){
 val NotSentYet = state(Interaction) {
     onEntry {
         furhat.say("It looks like something went wrong with the processing of your order. " +
-                "The product has not been send to you, we are very sorry for the inconvenience. ")
+                "The product has not been send to you, we are very sorry for this mistake.")
         parallel {
             goto(LookQuestion)
         }
@@ -495,26 +495,34 @@ val NotSentYet = state(Interaction) {
 val CancelOrder = state(Interaction) {
     onEntry {
         furhat.say ( "I will cancel the order right now and will send you a refund straight away. You can" +
-                " expect the money to be back on your account within 3 days. Also I will send you a 20% " +
-                "discount coupon for your next order, as a compromise for the inconvenience we caused you." )
+                " expect the money to be back on your account within 3 days." )
+        furhat.say ( "Also I will send you a 20% discount coupon for your next order," +
+                "as a compensation for the inconvenience we have caused you." )
         goto(AnythingElse)
     }
 }
 
 val ContinueOrder = state(Interaction) {
     onEntry {
-        furhat.ask("Your order has been placed now. You will receive a comfirmation e-mail. Also we will send" +
-                " it express, so you can expect your package to arrive tomorrow.")
+        furhat.say("Alright I have placed your order. You will receive a confirmation e-mail.")
+        furhat.say("Also, we will send it express, so you can expect your package to arrive tomorrow.")
+        furhat.ask("Is tomorrow convenient for you?")
     }
     onResponse<NotHome> {
         goto(DeliveryDate)
+    }
+    onResponse<No> {
+        goto(DeliveryDate)
+    }
+    onResponse<Yes> {
+        goto(AnythingElse)
     }
 }
 
 val DeliveryDate = state(Interaction) {
     onEntry {
         furhat.gesture(Gestures.Shake(strength = 0.2), async = true)
-        furhat.say ( "That is unfortunate. In the e-mail you have received you can select another delivery" +
+        furhat.say ( "That's unfortunate. Luckily, in the e-mail you have received you can select another delivery" +
                 " date or choose to have your package delivered to a pick-up point." )
         goto(AnythingElse)
     }
@@ -640,7 +648,7 @@ val WhatDay = state(Interaction){
     onEntry {
         val day = furhat.askFor<Days>("Which day would you like the package to be picked up?" )
         users.current.book.days  = day?.value
-        furhat.say ("Excellent, I have send a confirmation mail to the same email as your previous order." +
+        furhat.say ("Excellent, I have send a confirmation e-mail to the same email as your previous order." +
                 " We'll see you on "+ users.current.book.days )
         goto(AskForFeedback)
     }

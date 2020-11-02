@@ -132,19 +132,19 @@ class Good() : Intent() {
 
 class Cancel() : Intent(){
     override fun getExamples(lang: Language): List<String> {
-        return listOf("I would like to cancel my order", "I want to cancel it", "I want to cancel my order", "cancel order")
+        return listOf("I'd like to cancel it", "I would like to cancel my order", "I want to cancel it", "I want to cancel my order", "cancel order", "cancel it", "don't want it anymore", "come pick it up")
     }
 }
 
 class StillReceive() : Intent(){
     override fun getExamples(lang: Language): List<String> {
-        return listOf("I would still like to receive my order", "I would like to receive my order", "I would like to receive my product")
+        return listOf("I'd like to receive it", "I would still like to receive it", "I would still like to receive my order", "I would like to receive my order", "I would like to receive my product", "please send it now", "send it now", "can you still deliver it", "do deliver it")
     }
 }
 
 class NotHome() : Intent(){
     override fun getExamples(lang: Language): List<String> {
-        return listOf("I am not home tomorrow")
+        return listOf("I am not home tomorrow", "No not tomorrow", "I'm not home then")
     }
 }
 
