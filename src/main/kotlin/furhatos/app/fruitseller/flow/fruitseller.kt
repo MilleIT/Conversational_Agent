@@ -632,7 +632,7 @@ val NewOrder = state(Interaction) {
         }
         furhat.ask("Is there a day this week you are home before 5 pm?")
     }
-    onResponse<No> {
+    onResponse({listOf(NoDay(), No())}) {
         furhat.say ("That's ok, since free retour lasts 30 days there is still time left to return the " +
                 users.current.book.receivedOrder +
                 ". You can either make a return appointment at our website or keep the item." +
@@ -659,7 +659,8 @@ val RefundDelay = state(Interaction){
         parallel{
             goto(LookAround)
         }
-        furhat.say("The refund should indeed have taken place, as the product was already returned to us 2 days ago. I apologize for this delay and make sure we send you the refund within 24 hours.")
+        furhat.say("The refund should indeed have taken place, as the product was already returned to us 2 days ago.")
+        furhat.say("I apologize for this delay and make sure we send you the refund within 24 hours.")
         goto(AnythingElse)
     }
 }
@@ -669,7 +670,8 @@ val RefundNotStarted = state(Interaction){
         parallel{
             goto(LookAround)
         }
-        furhat.say("It seems like the product you returned has only just arrived today. The payment process has been set in motion and you will be refunded within 24 hours.")
+        furhat.say("It seems like the product you returned has only just arrived today.")
+        furhat.say("The payment process has been set in motion and you will be refunded within 24 hours.")
         goto(AnythingElse)
     }
 }
@@ -697,9 +699,14 @@ val RefundNotFixed = state(Interaction) {
         }
         val hasCopy = furhat.askYN("Do you still have the proof of shipment?")
         if (hasCopy!!) {
-            furhat.say("That's good to hear! If you could send an email to helpdesk@bol.com with a picture or scan of the proof of shipment, it will all be sorted out. We'll reply to you within 6 hours and then the refund will be processed within 24 hours. I apologize for the delay and extra effort this requested from you.")
+            furhat.say("That's good to hear! If you could send an email to helpdesk@bol.com with a picture or scan " +
+                    "of the proof of shipment, it will all be sorted out.")
+            furhat.say("We'll reply to you within 6 hours and then the refund will be processed within 24 hours.")
+            furhat.say("I apologize for the delay and extra effort this requested from you.")
         } else {
-            furhat.say("I'm sorry to say that we cannot refund you at this point but there might be a way to fix this. If you contact the delivery company, they could find out what happened. Once the package has arrived, I'll make sure you are refunded within 24 hours.")
+            furhat.say("I'm sorry to say that we cannot refund you at this point, but there might be a way to fix this.")
+            furhat.say("If you contact the delivery company, they could find out what happened. " +
+                    "Once the package has arrived, I'll make sure you are refunded within 24 hours.")
         }
         goto(AnythingElse)
     }
@@ -707,22 +714,27 @@ val RefundNotFixed = state(Interaction) {
 
 val RefundFixed = state(Interaction) {
     onEntry {
-        furhat.say("It can take up to five working days for a package to arrive. I can notify you if your package has arrived or if it still hasn't after five days. Then we'll find out what happened and make sure you receive the refund.")
+        furhat.say("It can take up to five working days for a package to arrive.")
+        furhat.say("I can notify you if your package has arrived or if it still hasn't after five days. " +
+                "Then we'll find out what happened and make sure you receive the refund.")
+
         parallel {
             goto(LookQuestion)
         }
         furhat.ask(" Would you like to be contacted via email, text message, or not at all?")
     }
 
-    onResponse<EmailORText> {
+    onResponse<EmailOrText> {
         furhat.say("Alright, noted. We'll be in touch soon.")
-        furhat.say("I sincerely hope the package will just arrive in no time and you do not need to put in any more effort than you already have.")
+        furhat.say("I sincerely hope the package will just arrive in no time and " +
+                "you do not need to put in any more effort than you already have.")
         goto(AnythingElse)
     }
 
-    onResponse<No> { // TODO also include not at all
+    onResponse<No> {
         furhat.say("Sure, no problem. You can always contact me via this channel 24/7.")
-        furhat.say("I sincerely hope the package will just arrive in no time and you do not need to put in any more effort than you already have.")
+        furhat.say("I sincerely hope the package will just arrive in no time and " +
+                "you do not need to put in any more effort than you already have.")
         goto(AnythingElse)
     }
 

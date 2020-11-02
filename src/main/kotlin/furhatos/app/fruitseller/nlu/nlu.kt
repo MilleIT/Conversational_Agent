@@ -160,7 +160,7 @@ class Confirm() : Intent() {
     }
 }
 
-class EmailORText() : Intent() {
+class EmailOrText() : Intent() {
     override fun getExamples(lang: Language): List<String> {
         return listOf("email", "Text Message", "Whatsapp", "I would like be contacted via email")
     }
