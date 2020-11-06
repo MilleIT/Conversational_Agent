@@ -743,7 +743,7 @@ val RefundFixed = state(Interaction) {
         furhat.ask(" Would you like to be contacted via e-mail, text message, or not at all?")
     }
 
-    onResponse<EmailORText> {
+    onResponse<EmailOrText> {
         furhat.say("Alright, noted. We'll be in touch soon.")
         furhat.say("I sincerely hope the package will just arrive in no time and " +
                 "you do not need to put in any more effort than you already have.")
