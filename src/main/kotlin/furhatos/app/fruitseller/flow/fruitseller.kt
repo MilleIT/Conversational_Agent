@@ -107,6 +107,7 @@ val Start = state(Interaction) {
         }
         furhat.attend(user = users.random)
         furhat.say("Hello! Welcome to the live support of Bol.com. My name is Furhat and I will be assisting you today. ")
+
         parallel {
             goto (LookAround)
         }
@@ -189,7 +190,11 @@ val Problem = state(Interaction) {
         furhat.gesture(Gestures.ExpressSad, async = true)
         furhat.say("I'm sorry that you " + users.current.book.problem + ".")
         if (users.current.book.emotion == "Unhappy") {
+            furhat.gesture(Gestures.CloseEyes, async = true)
+            furhat.gesture(Gestures.Shake( strength = 0.5), async = true)
             furhat.say("I understand this is upsetting.")
+            furhat.gesture(Gestures.OpenEyes, async = true)
+
         }
         parallel{
             goto(LookQuestion)
@@ -202,7 +207,10 @@ val Problem = state(Interaction) {
         furhat.gesture(Gestures.Nod(strength = 0.5));
         furhat.say("That's alright, let's focus on fixing this issue immediately.")
         if (users.current.book.emotion == "Unhappy") {
+            furhat.gesture(Gestures.CloseEyes, async = true)
+            furhat.gesture(Gestures.Shake( strength = 0.5), async = true)
             furhat.say("I'll do my utmost best for you.") // todo oude tekst:  hope you won't be unhappy anymore if we get this issue out of the way quickly
+            furhat.gesture(Gestures.OpenEyes, async = true)
         }
         goto(OrderAndName)
     }
@@ -242,9 +250,13 @@ val TellWhatHappened = state(Interaction) {
     onResponse {
         furhat.say("This is unfortunate indeed. I'm sorry this happened.") // todo oude tekst: "This is indeed not the service we would have wanted to provide you with. I'm sorry this happened."
         if (users.current.book.emotion == "Happy") {
-            furhat.say ( "Despite all this you still look optimistic. I admire that." ) // todo oude tekst: Looking at your smile it luckily appears to me that you are not greatly impacted by this problem.
+            furhat.gesture(Gestures.BigSmile(strength = 0.7, duration = 2.0), async = true)
+            furhat.say ("Despite all this you still look optimistic. I admire that." ) // todo oude tekst: Looking at your smile it luckily appears to me that you are not greatly impacted by this problem.
         } else if (users.current.book.emotion == "Unhappy") {
+            furhat.gesture(Gestures.CloseEyes, async = true)
+            furhat.gesture(Gestures.Shake( strength = 0.5), async = true)
             furhat.say ( "I understand that this whole ordeal has made you quite unhappy." )
+            furhat.gesture(Gestures.OpenEyes, async = true)
         }
         furhat.say("Let's fix this issue as soon as possible.") // todo oude tekst: "We'll fix this issue as soon as possible. I'll ask you some questions to make sure I have all necessary information."
         goto(OrderAndName)
@@ -277,6 +289,7 @@ val OrderAndName = state(Interaction) {
             furhat.say("I'm sorry I couldn't solve it right away.")
             furhat.say("Perhaps you can look up the order number and come back so I can help you fix this.")
             if (users.current.book.emotion == "Happy") {
+                furhat.gesture(Gestures.BigSmile(strength = 0.7, duration = 2.0), async = true)
                 furhat.say("I hope you'll enjoy the rest of your day!")
             }
             else if (users.current.book.emotion == "Unhappy") {
@@ -333,7 +346,11 @@ val LookForCause = state(Interaction) {
         }
         furhat.say("While I'm looking for the data, I've noticed you are looking " + users.current.book.emotion + "")
         if (users.current.book.emotion == "Unhappy") {
+            furhat.gesture(Gestures.CloseEyes, async = true)
+            furhat.gesture(Gestures.Shake( strength = 0.5), async = true)
            furhat.say("I understand this really is frustrating.")
+            furhat.gesture(Gestures.OpenEyes, async = true)
+
             var alright = furhat.askYN("Are you doing alright?")
             if (alright!!) {
                 furhat.say("Good to hear you're holding up. I'll try to fix the issue as fast as possible. " +
@@ -345,6 +362,7 @@ val LookForCause = state(Interaction) {
         } else if (users.current.book.emotion == "Neutral") {
             furhat.say( "I hope you are satisfied with our support. Let's quickly finish this up." ) // oude tekst: "I'm glad you are not very upset about the issue you are experiencing. Let's quickly finish this up."
         } else if (users.current.book.emotion == "Happy") {
+            furhat.gesture(Gestures.BigSmile(strength = 0.7, duration = 2.0), async = true)
             furhat.say( "I'm glad you are too upset about the issue. Let's quickly finish this up.") // oude tekst: I'm glad you are satisfied with our support. Let's quickly finish this up and solve your issue.
         }
         TimeUnit.SECONDS.sleep(2)
@@ -388,6 +406,7 @@ val TryOrderAgain = state(Interaction) {
             furhat.say("I'm sorry I couldn't solve it right away.")
             furhat.say("Perhaps you can look up the order number and come back so I can help you fix this.")
             if (users.current.book.emotion == "Happy") {
+                furhat.gesture(Gestures.BigSmile(strength = 0.7, duration = 2.0), async = true)
                 furhat.say("I hope you'll enjoy the rest of your day!")
             }
             else if (users.current.book.emotion == "Unhappy") {
@@ -602,7 +621,7 @@ val NewOrder = state(Interaction) {
         furhat.gesture(Gestures.Nod(strength = 0.5), async = true)
         furhat.say ("Ok, I made a new order for you for a " + users.current.book.intendedOrder +
             ". I've also added free priority shipping to compensate for the receivement of a wrong package.")
-        furhat.gesture(Gestures.BigSmile, async = true)
+        furhat.gesture(Gestures.BigSmile(strength = 0.7, duration = 2.0), async = true)
         furhat.gesture(Gestures.Wink(duration = 2.0), async = false)
         furhat.say(" When we deliver the new order we'll take the wrongly received " + users.current.book.receivedOrder + "with us.")
         parallel{
@@ -719,7 +738,10 @@ val AnythingElse = state(Interaction) {
             goto(RunPython) //Is dit de bedoeling
         }
         if (users.current.book.emotion == "Unhappy") {
+            furhat.gesture(Gestures.CloseEyes, async = true)
+            furhat.gesture(Gestures.Shake( strength = 0.5), async = true)
             furhat.say("I'm sorry you are still unhappy with the whole situation")
+            furhat.gesture(Gestures.OpenEyes, async = true)
         } else if (users.current.book.emotion == "Happy") {
             furhat.say("I'm glad that I could be of service and it appears to me that you are satisfied with my support")
         }
