@@ -90,7 +90,7 @@ class WrongPackage() : Intent() {
 
 class NoPackage() : Intent() {
     override fun getExamples(lang: Language): List<String> {
-        return listOf("My package didn't arrive", "I didn't receive my package", "No package received", "No package", "I didn't receive the package")
+        return listOf("My package didn't arrive", "I didn't receive my package", "No package received", "No package", "I didn't receive the package",  "The package wasn't delivered", "My package isn't here", "The package isn't here")
     }
 }
 
@@ -132,35 +132,35 @@ class Good() : Intent() {
 
 class Cancel() : Intent(){
     override fun getExamples(lang: Language): List<String> {
-        return listOf("I would like to cancel my order", "I want to cancel it", "I want to cancel my order", "cancel order")
+        return listOf("I'd like to cancel it", "I would like to cancel my order", "I want to cancel it", "I want to cancel my order", "cancel order", "cancel it", "don't want it anymore", "come pick it up")
     }
 }
 
 class StillReceive() : Intent(){
     override fun getExamples(lang: Language): List<String> {
-        return listOf("I would still like to receive my order", "I would like to receive my order", "I would like to receive my product")
+        return listOf("I'd like to receive it", "I would still like to receive it", "I would still like to receive my order", "I would like to receive my order", "I would like to receive my product", "please send it now", "send it now", "can you still deliver it", "do deliver it")
     }
 }
 
 class NotHome() : Intent(){
     override fun getExamples(lang: Language): List<String> {
-        return listOf("I am not home tomorrow")
+        return listOf("I am not home tomorrow", "No not tomorrow", "I'm not home then")
     }
 }
 
 class TooLate() : Intent() {
     override fun getExamples(lang: Language): List<String> {
-        return listOf("That is too late, I don't want it anymore.")
+        return listOf("Return the order", "That last part", "Send it back", "That is too late, I don't want it anymore.", "Too late", "Don't want it", "Come pick it up", "Can I return it?", "I want to return it", "Is it possible to return it", "I have no use for it")
     }
 }
 
 class Confirm() : Intent() {
     override fun getExamples(lang: Language): List<String> {
-        return listOf("Okay", "Allright")
+        return listOf("No, that's alright", "A coupon is ok", "Yes, a coupon", "A coupon please", "Okay", "Alright", "Ok", "Thanks", "Thank you", "Fine", "Good", "Nice", "Yes", "Yes, please", "Aye", "Excellent", "Wonderful", "Superb", "Great", "Fine", "That's good", "That's nice", "That's great")
     }
 }
 
-class EmailORText() : Intent() {
+class EmailOrText() : Intent() {
     override fun getExamples(lang: Language): List<String> {
         return listOf("email", "Text Message", "Whatsapp", "I would like be contacted via email")
     }
