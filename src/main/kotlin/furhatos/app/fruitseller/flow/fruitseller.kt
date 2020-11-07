@@ -424,10 +424,9 @@ val LookForCause = state(Interaction) {
             else if(random == 2){goto(OnItsWay) }
         }
         else if (users.current.book.problem == "didn't receive a refund") {
-            val random = Random.nextInt(3) + 1;
+            val random = Random.nextInt(2) + 1;
             if(random == 1){goto(RefundDelay)}
             else if(random == 2){goto(RefundInMotion)}
-            else if(random == 3){goto(RefundNotStarted)}
         }
     }
 }
@@ -682,7 +681,6 @@ val CantHelp = state(Interaction) {
     }
 }
 
-
 val NewOrder = state(Interaction) {
     onEntry {
         furhat.gesture(Gestures.Nod(strength = 0.5), async = true)
@@ -723,19 +721,62 @@ val RefundDelay = state(Interaction){
         parallel{
             goto(LookAround)
         }
-        furhat.say("The refund should indeed have taken place, as the product was already returned to us 2 days ago.")
-        furhat.say("I apologize for this delay and make sure we send you the refund within 24 hours.")
+        furhat.say("It looks like the product was already returned to us yesterday, " +
+                "but the payment process has not been set in motion.")
+        furhat.say("Let me quickly check why exactly.")
+        val random = Random.nextInt(2) + 1;
+        if(random == 1){goto(ProductDamaged)}
+        else if(random == 2){goto(ProductIncomplete)}
+    }
+}
+
+val ProductDamaged = state(Interaction) {
+    onEntry {
+        furhat.say("Apparently the product has arrived damaged. We are currently investing if the " +
+                "transportation company has had any part in this.")
+        furhat.say("Let me just ask if you're sure the product was ok when you sent it?")
+    }
+
+    onResponse<Yes> {
+        goto(NotifyLater)
+    }
+
+    onResponse<No> {
+        goto(ReferToColleague)
+    }
+}
+
+val ProductIncomplete = state(Interaction) {
+    onEntry {
+        furhat.say("Apparently some components are missing. " +
+                "We are currently investing if the transportation company has had any part in this.")
+        furhat.say("Let me just ask if you are sure you didn't forget to return any loose parts?")
+    }
+
+    onResponse<Yes> {
+        goto(NotifyLater)
+    }
+
+    onResponse<No> {
+        goto(ReferToColleague)
+    }
+
+}
+
+val ReferToColleague = state(Interaction) {
+    onEntry {
+        furhat.say("I see, in that case I think it's best to talk to one of my human colleagues " +
+                "who knows more about the product. You can contact them via our website.")
+        furhat.say("I'm sorry I couldn't solve this issue with you right away.")
         goto(AnythingElse)
     }
 }
 
-val RefundNotStarted = state(Interaction){
+val NotifyLater = state(Interaction) {
     onEntry {
-        parallel{
-            goto(LookAround)
-        }
-        furhat.say("It seems like the product you returned has only just arrived today.")
-        furhat.say("The payment process has been set in motion and you will be refunded within 24 hours.")
+        furhat.say("Alright, sorry I had to ask. I'll contact my colleague who is currently working on this and let them know.")
+        furhat.say("You'll be notified within two working days.")
+        furhat.say("I'm sorry I couldn't solve this issue with you right away.")
         goto(AnythingElse)
     }
 }
