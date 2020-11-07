@@ -43,6 +43,18 @@ class Person : EnumEntity(stemming = true, speechRecPhrases = true) {
     }
 }
 
+class SimpleNo() : Intent() {
+    override fun getExamples(lang: Language): List<String> {
+        return listOf("No", "No thanks", "Nope", "Not really", "Nahh", "I don't think so", "Rather not", "Let's just continue", "No I want to quickly fix this", "Not exactly", "Rather not")
+    }
+}
+
+class SimpleYes() : Intent() {
+    override fun getExamples(lang: Language): List<String> {
+        return listOf("Yes", "Yes thanks", "Yes sure", "Alright", "Sure", "Ok", "Yeah", "Yeah ok", "Okay", "I will", "Yes can I start")
+    }
+}
+
 class AvailableDays(var days : Days? = null) : ComplexEnumEntity() {
     override fun getEnum(lang: Language): List<String> {
         return listOf("@days")

@@ -149,7 +149,7 @@ val Start = state(Interaction) {
             goto (LookQuestion)
         }
         furhat.gesture(Gestures.Thoughtful(strength = 0.2), async = true)
-        furhat.ask("Could you tell me what problem you are experiencing?")
+        furhat.ask("Could you tell me which of these problems you are experiencing?")
     }
 
     onReentry {
@@ -157,8 +157,8 @@ val Start = state(Interaction) {
         furhat.ask({random {
             +"What problem are you experiencing?"
             +"How can I help you?"
-            +"Could you repeat that please?"
-            +"What did you mean exactly?"
+            +"What went wrong with your order?"
+            +"Please tell me what problem you are experiencing."
         }})
         furhat.gesture(Gestures.Thoughtful, async = true)
     }
@@ -235,21 +235,26 @@ val Problem = state(Interaction) {
         furhat.ask("Do you want to tell me what happened?")
     }
 
-    onResponse<No> {
+    onResponse<SimpleNo> {
         furhat.gesture(Gestures.Nod(strength = 0.5));
-        furhat.say("That's alright, let's focus on fixing this issue immediately.")
+        furhat.say("Ok, let's focus on fixing this issue immediately.")
         if (userEmotion == "Unhappy") {
-            furhat.gesture(Gestures.CloseEyes, async = true)
-            furhat.gesture(Gestures.Shake( strength = 0.5), async = true)
-            furhat.say("I'll do my utmost best for you.") // todo oude tekst:  hope you won't be unhappy anymore if we get this issue out of the way quickly
-            furhat.gesture(Gestures.OpenEyes, async = true)
+            // TODO previous version deleten?
+            //furhat.gesture(Gestures.CloseEyes, async = true)
+            //furhat.gesture(Gestures.Shake( strength = 0.5), async = true)
+            //furhat.say("I'll do my utmost best for you.") // todo oude tekst:  hope you won't be unhappy anymore if we get this issue out of the way quickly
+            //furhat.gesture(Gestures.OpenEyes, async = true)
+            furhat.gesture(Gestures.Thoughtful( strength = 2.0), async = true)
+            furhat.say("I'll do my utmost best for you.")
+            furhat.gesture(Gestures.GazeAway( strength = 0.4), async = true)
+            TimeUnit.SECONDS.sleep(1)
         }
         goto(OrderAndName)
     }
 
-    onResponse<Yes> {
+    onResponse<SimpleYes> {
         furhat.gesture(Gestures.Nod(strength = 0.5));
-        furhat.say("Please do tell me, I'm listening.")
+        furhat.ask("Please tell me, I'm listening.")
         goto(TellWhatHappened)
     }
 
@@ -257,11 +262,18 @@ val Problem = state(Interaction) {
         furhat.gesture(Gestures.Nod(strength = 0.5));
         goto(TellWhatHappened)
     }
+
 }
 
 val TellWhatHappened = state(Interaction) {
     onEntry {
-        furhat.listen(endSil = 8000)
+        TimeUnit.SECONDS.sleep(2)
+        furhat.say("Hmm")
+        furhat.listen(endSil = 6000)
+    }
+
+    onReentry {
+        furhat.listen(endSil = 2000)
     }
 
     onInterimResponse(endSil = 2000) {
@@ -269,17 +281,36 @@ val TellWhatHappened = state(Interaction) {
         if (random == 1 )
             furhat.say("Okay", async = true)
         else if (random == 2)
-            furhat.say("Hmm", async = true)
+            furhat.say("Ok", async = true)
         else if (random == 3)
             furhat.say("I see", async = true)
         else if (random == 4)
             furhat.say("Right", async = true)
         else
             furhat.gesture(Gestures.Nod)
-        furhat.listen(endSil = 8000, timeout = 3000)
+        furhat.listen(endSil = 4000, timeout = 2000)
+    }
+
+    var noresponse = 0
+    onNoResponse {
+        if (noresponse == 1) {
+            furhat.say("Ok, let's continue.")
+            goto(ToldWhatHappened)
+        }
+        noresponse++
+        furhat.ask({random {
+            +"Did you want to share more?"
+            +"Is there more you wanted to tell?"
+        }})
     }
 
     onResponse {
+        goto(ToldWhatHappened)
+    }
+}
+
+val ToldWhatHappened = state(Interaction) {
+    onEntry {
         furhat.say("This is unfortunate indeed. I'm sorry this happened.") // todo oude tekst: "This is indeed not the service we would have wanted to provide you with. I'm sorry this happened."
         if (userEmotion == "Happy") {
             furhat.gesture(Gestures.BigSmile(strength = 0.7, duration = 2.0), async = true)
