@@ -45,13 +45,13 @@ class Person : EnumEntity(stemming = true, speechRecPhrases = true) {
 
 class SimpleNo() : Intent() {
     override fun getExamples(lang: Language): List<String> {
-        return listOf("No", "No thanks", "Nope", "Not really", "Nahh", "I don't think so", "Rather not", "Let's just continue", "No I want to quickly fix this", "Not exactly", "Rather not")
+        return listOf("No", "Continue", "Continue please", "Let's move on", "No thanks", "Nope", "Not really", "Nahh", "I don't think so", "Rather not", "Let's just continue", "No I want to quickly fix this", "Not exactly", "Rather not")
     }
 }
 
 class SimpleYes() : Intent() {
     override fun getExamples(lang: Language): List<String> {
-        return listOf("Yes", "Yes thanks", "Yes sure", "Alright", "Sure", "Ok", "Yeah", "Yeah ok", "Okay", "I will", "Yes can I start")
+        return listOf("Yes", "Elaborate", "Elaborate please", "Yes thanks", "Yes sure", "Alright", "Sure", "Ok", "Yeah", "Yeah ok", "Okay", "I will", "Yes can I start")
     }
 }
 
@@ -96,19 +96,19 @@ class NoDay() : Intent() {
 
 class WrongPackage() : Intent() {
     override fun getExamples(lang: Language): List<String> {
-        return listOf("I got the wrong package", "Wrong package", "Wrong package delivered", "I received the wrong package")
+        return listOf("I got the wrong package", "Wrong package", "Wrong package delivered", "I received the wrong package", "The second one", "The second problem")
     }
 }
 
 class NoPackage() : Intent() {
     override fun getExamples(lang: Language): List<String> {
-        return listOf("My package didn't arrive", "I didn't receive my package", "No package received", "No package", "I didn't receive the package",  "The package wasn't delivered", "My package isn't here", "The package isn't here")
+        return listOf("My package didn't arrive", "I didn't receive my package", "No package received", "No package", "I didn't receive the package",  "The package wasn't delivered", "My package isn't here", "The package isn't here", "The package is late", "The package is lost", "The first one", "The first problem")
     }
 }
 
 class NoRefund() : Intent() {
     override fun getExamples(lang: Language): List<String> {
-        return listOf("I didn't receive my refund", "No refund", "No refund received", "I'm not refunded", "I didn't receive a refund")
+        return listOf("I didn't receive my refund", "No refund", "No refund received", "I'm not refunded", "I didn't receive a refund", "The last one", "The last problem", "The third one", "The third problem")
     }
 }
 

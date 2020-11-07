@@ -144,7 +144,7 @@ val Start = state(Interaction) {
         parallel {
             goto (LookAround)
         }
-        furhat.say("I can help when a package is late or lost, a wrong package is delivered, or a refund is not received.")
+        furhat.say("I can help when a package is late or lost, a wrong package is delivered, or a refund isn't received.")
         parallel {
             goto (LookQuestion)
         }
@@ -182,17 +182,27 @@ val Start = state(Interaction) {
     onNoResponse {
         noresponse++
         if (noresponse > 3)
-            furhat.say("Perhaps another time is better. You can contact me 24/7.")
+            furhat.say("Perhaps another time is better. Don't worry about it, you can contact me 24/7.")
         else if (noresponse > 2) {
-            furhat.say("Are you still there?")
+            furhat.say({random {
+                +"Are you still there?"
+                +"Are you there?"
+                +"Are you able to continue our conversation?"
+            }})
             reentry()
         }
         else if (noresponse > 1) {
-            furhat.say("Sorry, I still didn't hear you.")
+            furhat.say({random {
+                +"I'm sorry, I still didn't hear you."
+                +"Hmm, I still didn't hear you."
+            }})
             reentry()
         }
         else {
-            furhat.say("Sorry, I didn't hear you.")
+            furhat.say({random {
+                +"Sorry, I don't think I heard you."
+                +"Sorry, I didn't hear you."
+            }})
             reentry()
         }
     }
@@ -235,7 +245,54 @@ val Problem = state(Interaction) {
         furhat.ask("Do you want to tell me what happened?")
     }
 
+    onReentry {
+        furhat.listen()
+    }
+
     onResponse<SimpleNo> {
+        goto(NoStory)
+    }
+
+    onResponse<SimpleYes> {
+        furhat.gesture(Gestures.Nod(strength = 0.5));
+        furhat.ask("Please tell me, I'm listening.")
+        goto(TellStory)
+    }
+
+    onResponse {
+        furhat.gesture(Gestures.Nod(strength = 0.5));
+        goto(TellStory)
+    }
+
+    var noresponse = 0
+    onNoResponse {
+        noresponse++
+        if (noresponse > 3)
+            furhat.say("Perhaps another time is better. Don't worry about it. You can contact me 24/7.")
+        else if (noresponse > 2) {
+            furhat.say({random {
+                +"Are you still there?"
+                +"Are you there?"
+                +"Are you able to continue our conversation?"
+            }})
+            reentry()
+        }
+        else if (noresponse > 1) {
+            furhat.say({random {
+                +"I'm sorry, I didn't hear you."
+                +"Hmm, I didn't hear you."
+            }})
+            reentry()
+        }
+        else {
+            furhat.ask("Would you prefer to continue or elaborate?")
+            reentry()
+        }
+    }
+}
+
+val NoStory = state(Interaction) {
+    onEntry {
         furhat.gesture(Gestures.Nod(strength = 0.5));
         furhat.say("Ok, let's focus on fixing this issue immediately.")
         if (userEmotion == "Unhappy") {
@@ -251,21 +308,9 @@ val Problem = state(Interaction) {
         }
         goto(OrderAndName)
     }
-
-    onResponse<SimpleYes> {
-        furhat.gesture(Gestures.Nod(strength = 0.5));
-        furhat.ask("Please tell me, I'm listening.")
-        goto(TellWhatHappened)
-    }
-
-    onResponse {
-        furhat.gesture(Gestures.Nod(strength = 0.5));
-        goto(TellWhatHappened)
-    }
-
 }
 
-val TellWhatHappened = state(Interaction) {
+val TellStory = state(Interaction) {
     onEntry {
         TimeUnit.SECONDS.sleep(2)
         furhat.say("Hmm")
@@ -295,7 +340,7 @@ val TellWhatHappened = state(Interaction) {
     onNoResponse {
         if (noresponse == 1) {
             furhat.say("Ok, let's continue.")
-            goto(ToldWhatHappened)
+            goto(ToldStory)
         }
         noresponse++
         furhat.ask({random {
@@ -305,11 +350,11 @@ val TellWhatHappened = state(Interaction) {
     }
 
     onResponse {
-        goto(ToldWhatHappened)
+        goto(ToldStory)
     }
 }
 
-val ToldWhatHappened = state(Interaction) {
+val ToldStory = state(Interaction) {
     onEntry {
         furhat.say("This is unfortunate indeed. I'm sorry this happened.") // todo oude tekst: "This is indeed not the service we would have wanted to provide you with. I'm sorry this happened."
         if (userEmotion == "Happy") {
@@ -382,6 +427,35 @@ val OrderAndName = state(Interaction) {
         }})
         reentry()
     }
+
+    var noresponse = 0
+    onNoResponse {
+        noresponse++
+        if (noresponse > 3)
+            furhat.say("Perhaps another time is better. Don't worry about it. You can contact me 24/7.")
+        else if (noresponse > 2) {
+            furhat.say({random {
+                +"Are you still there?"
+                +"Are you there?"
+                +"Are you able to continue our conversation?"
+            }})
+            reentry()
+        }
+        else if (noresponse > 1) {
+            furhat.say({random {
+                +"I'm sorry, I still didn't hear you."
+                +"Hmm, I still didn't hear you."
+            }})
+            reentry()
+        }
+        else {
+            furhat.say({random {
+                +"Sorry, I don't think I heard you."
+                +"Sorry, I didn't hear you."
+            }})
+            reentry()
+        }
+    }
 }
 
 val LookUpOrder = state(Interaction) {
@@ -423,7 +497,7 @@ val LookForCause = state(Interaction) {
         furhat.say("Alright then, now please give me a moment to retrieve the relevant data we have on this.")
         furhat.attend(Loc())
         furhat.attend(user = users.random)
-        furhat.say("While I'm looking for the data, I've noticed you are looking " + userEmotion + "")
+        furhat.say("While I'm looking for the data, I've noticed you are looking " + userEmotion.toLowerCase() + ".")
         if (userEmotion == "Unhappy") {
             furhat.gesture(Gestures.CloseEyes, async = true)
             furhat.gesture(Gestures.Shake( strength = 0.5), async = true)
@@ -433,7 +507,7 @@ val LookForCause = state(Interaction) {
             var alright = furhat.askYN("Are you doing alright?")
             if (alright!!) {
                 furhat.say("Good to hear you're holding up. I'll try to fix the issue as fast as possible. " +
-                        "It will probably not take more than five minutes")
+                        "It will probably not take more than five minutes.")
             } else {
                 furhat.say("I'm sorry, I'll try to fix the issue as fast as possible. " +
                         "It will probably not take more than five minutes.")
@@ -629,7 +703,7 @@ val WrongPackage = state(Interaction) {
         parallel {
             goto(LookQuestion)
         }
-        furhat.ask(" could you tell me what you intended to order? " +
+        furhat.ask("Could you tell me what you intended to order? " +
                     "Please note that the only items we sell are laptops, TVs, Playstations, and headphones." )
         }
     onResponse<Headphones> {
@@ -904,7 +978,7 @@ val AnythingElse = state(Interaction) {
 val AskForFeedback = state(Interaction) {
     onEntry {
         if (userEmotion == "Unhappy") {
-            furhat.say("I've noticed you are unhappy. Can I know what caused this unhappiness.")
+            furhat.say("I've noticed you are unhappy. I would like to know what could have caused this.")
         } else if (userEmotion == "Neutral") {
             furhat.say("I had a hard time estimating your emotions.")
         } else if (userEmotion == "Happy") {
@@ -915,7 +989,8 @@ val AskForFeedback = state(Interaction) {
         if(givesFeedback!!) {
             goto(FeedbackRating)
         } else {
-            furhat.say("That's alright. I wish you a nice day!")
+            furhat.say("That's alright.")
+            furhat.say("I wish you a nice day!")
         }
     }
 }
@@ -924,7 +999,7 @@ val FeedbackRating = state(Interaction) {
     onEntry {
         furhat.gesture(Gestures.Nod(strength = 0.2), async = true)
 
-        furhat.say("That's great!)")
+        furhat.say("That's great!")
         parallel {
             goto(LookQuestion)
         }
@@ -961,7 +1036,7 @@ val BadDoneDifferently = state(Interaction){
 val OKDoneDifferently = state(Interaction){
     onEntry {
 
-        furhat.say("Ah I see.")
+        furhat.say("I see.")
         parallel {
             goto(LookQuestion)
         }
