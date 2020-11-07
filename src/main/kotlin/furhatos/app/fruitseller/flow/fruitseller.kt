@@ -4,6 +4,7 @@ import furhatos.app.fruitseller.book
 import furhatos.app.fruitseller.nlu.*
 import furhatos.app.fruitseller.pythonLoc
 import furhatos.app.fruitseller.scriptPath
+import furhatos.app.fruitseller.userEmotion
 /*
 import furhatos.app.fruitseller.order
 */
@@ -11,6 +12,7 @@ import furhatos.flow.kotlin.*
 import furhatos.gestures.Gestures
 import furhatos.nlu.common.*
 import furhatos.records.Location
+import kotlinx.coroutines.*
 import java.io.File
 import java.io.InputStreamReader
 import java.util.*
@@ -61,8 +63,39 @@ val LookAround = state(Interaction) {
 
 val MockEmotion = state(Interaction) {
     onEntry {
-        users.current.book.emotion = "Unhappy"
+        userEmotion = "Unhappy"
     }
+}
+
+fun startCoroutine() {
+    GlobalScope.launch {
+        val loc = pythonLoc //must be location of python.exe for python 3.6.6
+        val command = listOf<String>(loc,"kotlinclient.py")
+        val path : File = File(scriptPath) // must be directory where kotlinclient.py is located
+        println("Command: $command")
+        while (true){
+            val pb = ProcessBuilder(command)
+            pb.directory(path)
+            pb.redirectErrorStream(true)
+
+            //pb.inheritIO()
+            val process = pb.start()
+            val reader = Scanner(InputStreamReader(process.inputStream))
+            while (reader.hasNextLine()) {
+                val latestEmotion : String = reader.nextLine()
+                if (latestEmotion != userEmotion){
+                    println(latestEmotion)
+                    userEmotion = latestEmotion
+                }
+
+            }
+            process.waitFor()
+        }
+}
+}
+
+val StartEmotions = state {
+    startCoroutine()
 }
 
 val RunPython = state(Interaction) {
@@ -92,7 +125,7 @@ val RunPython = state(Interaction) {
         while (reader.hasNextLine()) {
             val latestEmotion : String = reader.nextLine()
             println(latestEmotion)
-            users.current.book.emotion = latestEmotion
+            userEmotion = latestEmotion
         }
         process.waitFor()
     }
@@ -102,7 +135,7 @@ val RunPython = state(Interaction) {
 val Start = state(Interaction) {
     onEntry {
         parallel {
-            goto(RunPython)
+            goto(StartEmotions)
             //goto(MockEmotion)
         }
         furhat.attend(user = users.random)
@@ -184,12 +217,11 @@ val Start = state(Interaction) {
 val Problem = state(Interaction) {
     onEntry {
         parallel {
-            goto(RunPython) //Is dit de bedoeling
             goto(LookAround)
         }
         furhat.gesture(Gestures.ExpressSad, async = true)
         furhat.say("I'm sorry that you " + users.current.book.problem + ".")
-        if (users.current.book.emotion == "Unhappy") {
+        if (userEmotion == "Unhappy") {
             furhat.gesture(Gestures.CloseEyes, async = true)
             furhat.gesture(Gestures.Shake( strength = 0.5), async = true)
             furhat.say("I understand this is upsetting.")
@@ -206,7 +238,7 @@ val Problem = state(Interaction) {
     onResponse<No> {
         furhat.gesture(Gestures.Nod(strength = 0.5));
         furhat.say("That's alright, let's focus on fixing this issue immediately.")
-        if (users.current.book.emotion == "Unhappy") {
+        if (userEmotion == "Unhappy") {
             furhat.gesture(Gestures.CloseEyes, async = true)
             furhat.gesture(Gestures.Shake( strength = 0.5), async = true)
             furhat.say("I'll do my utmost best for you.") // todo oude tekst:  hope you won't be unhappy anymore if we get this issue out of the way quickly
@@ -249,10 +281,10 @@ val TellWhatHappened = state(Interaction) {
 
     onResponse {
         furhat.say("This is unfortunate indeed. I'm sorry this happened.") // todo oude tekst: "This is indeed not the service we would have wanted to provide you with. I'm sorry this happened."
-        if (users.current.book.emotion == "Happy") {
+        if (userEmotion == "Happy") {
             furhat.gesture(Gestures.BigSmile(strength = 0.7, duration = 2.0), async = true)
             furhat.say ("Despite all this you still look optimistic. I admire that." ) // todo oude tekst: Looking at your smile it luckily appears to me that you are not greatly impacted by this problem.
-        } else if (users.current.book.emotion == "Unhappy") {
+        } else if (userEmotion == "Unhappy") {
             furhat.gesture(Gestures.CloseEyes, async = true)
             furhat.gesture(Gestures.Shake( strength = 0.5), async = true)
             furhat.say ( "I understand that this whole ordeal has made you quite unhappy." )
@@ -294,11 +326,11 @@ val OrderAndName = state(Interaction) {
         else {
             furhat.say("I'm sorry I couldn't solve it right away.")
             furhat.say("Perhaps you can look up the order number and come back so I can help you fix this.")
-            if (users.current.book.emotion == "Happy") {
+            if (userEmotion == "Happy") {
                 furhat.gesture(Gestures.BigSmile(strength = 0.7, duration = 2.0), async = true)
                 furhat.say("I hope you'll enjoy the rest of your day!")
             }
-            else if (users.current.book.emotion == "Unhappy") {
+            else if (userEmotion == "Unhappy") {
                 furhat.say({random {
                     +"I'm sure we'll fix it next time!"
                     +"I'm sure we'll solve it next time!"
@@ -360,11 +392,8 @@ val LookForCause = state(Interaction) {
         furhat.say("Alright then, now please give me a moment to retrieve the relevant data we have on this.")
         furhat.attend(Loc())
         furhat.attend(user = users.random)
-        parallel {
-            goto(RunPython) //Is dit de bedoeling
-        }
-        furhat.say("While I'm looking for the data, I've noticed you are looking " + users.current.book.emotion + "")
-        if (users.current.book.emotion == "Unhappy") {
+        furhat.say("While I'm looking for the data, I've noticed you are looking " + userEmotion + "")
+        if (userEmotion == "Unhappy") {
             furhat.gesture(Gestures.CloseEyes, async = true)
             furhat.gesture(Gestures.Shake( strength = 0.5), async = true)
            furhat.say("I understand this really is frustrating.")
@@ -378,9 +407,9 @@ val LookForCause = state(Interaction) {
                 furhat.say("I'm sorry, I'll try to fix the issue as fast as possible. " +
                         "It will probably not take more than five minutes.")
             }
-        } else if (users.current.book.emotion == "Neutral") {
+        } else if (userEmotion == "Neutral") {
             furhat.say( "I hope you are satisfied with our support. Let's quickly finish this up." ) // oude tekst: "I'm glad you are not very upset about the issue you are experiencing. Let's quickly finish this up."
-        } else if (users.current.book.emotion == "Happy") {
+        } else if (userEmotion == "Happy") {
             furhat.gesture(Gestures.BigSmile(strength = 0.7, duration = 2.0), async = true)
             furhat.say( "I'm glad you are too upset about the issue. Let's quickly finish this up.") // oude tekst: I'm glad you are satisfied with our support. Let's quickly finish this up and solve your issue.
         }
@@ -416,19 +445,16 @@ val TryOrderAgain = state(Interaction) {
     }
 
     onResponse<No> {
-        parallel {
-            goto(RunPython) //Is dit de bedoeling
-        }
         furhat.say("We do really need this information to continue.")
         var noInformation = furhat.askYN("Are you sure you don't have this information right now and want to quit?")
         if (noInformation!!) {
             furhat.say("I'm sorry I couldn't solve it right away.")
             furhat.say("Perhaps you can look up the order number and come back so I can help you fix this.")
-            if (users.current.book.emotion == "Happy") {
+            if (userEmotion == "Happy") {
                 furhat.gesture(Gestures.BigSmile(strength = 0.7, duration = 2.0), async = true)
                 furhat.say("I hope you'll enjoy the rest of your day!")
             }
-            else if (users.current.book.emotion == "Unhappy") {
+            else if (userEmotion == "Unhappy") {
                 furhat.say({random {
                     +"I'm sure we'll fix it next time!"
                     +"I'm sure we'll solve it next time!"
@@ -787,15 +813,12 @@ val AnythingElse = state(Interaction) {
     }
 
     onResponse<Yes> {
-        parallel {
-            goto(RunPython) // todo Is dit de bedoeling
-        }
-        if (users.current.book.emotion == "Unhappy") {
+        if (userEmotion == "Unhappy") {
             furhat.gesture(Gestures.CloseEyes, async = true)
             furhat.gesture(Gestures.Shake( strength = 0.5), async = true)
             furhat.say("I'm sorry you are still unhappy with the whole situation")
             furhat.gesture(Gestures.OpenEyes, async = true)
-        } else if (users.current.book.emotion == "Happy") {
+        } else if (userEmotion == "Happy") {
             furhat.say("I'm glad that I could be of service and it appears to me that you are satisfied with my support")
         }
         furhat.say("I think that one of my colleagues can be of better help, I'll put you through.")
@@ -808,14 +831,11 @@ val AnythingElse = state(Interaction) {
 
 val AskForFeedback = state(Interaction) {
     onEntry {
-        parallel {
-            goto(RunPython) //Is dit de bedoeling
-        }
-        if (users.current.book.emotion == "Unhappy") {
+        if (userEmotion == "Unhappy") {
             furhat.say("I've noticed you are unhappy. Can I know what caused this unhappiness.")
-        } else if (users.current.book.emotion == "Neutral") {
+        } else if (userEmotion == "Neutral") {
             furhat.say("I had a hard time estimating your emotions.")
-        } else if (users.current.book.emotion == "Happy") {
+        } else if (userEmotion == "Happy") {
             furhat.say("I've noticed you are happy. It would be great if you told me what caused you to be happy.")
         }
         var givesFeedback = furhat.askYN("As you know I'm a bot that is ever improving. Would you be willing to give me " +
