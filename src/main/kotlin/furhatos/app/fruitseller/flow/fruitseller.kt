@@ -274,6 +274,12 @@ val OrderAndName = state(Interaction) {
         }})
     }
 
+    onReentry {
+        furhat.attend(user = users.random)
+        furhat.listen()
+        furhat.gesture(Gestures.Thoughtful, async = true)
+    }
+
     onResponse<OrderAndName> {
         //Store Order and Last name
         goto(LookUpOrder)
@@ -299,6 +305,19 @@ val OrderAndName = state(Interaction) {
                 }})
             }
         }
+    }
+
+    onResponse {
+        furhat.say({random {
+            +"Sorry, I don't think I heard you right. Which order number and first name did you say?"
+            +"Could you say that again? I don't think I heard you right."
+            +"I don't think I understood you. Could you perhaps repeat that?"
+            +"Sorry, can you repeat what you just said?"
+            +"I think I misheard you, could you repeat the order number and first  name?"
+            +"Sorry, I didn't hear an order number and first name."
+            +"I didn't catch an order number and first name. Could you repeat it please?"
+        }})
+        reentry()
     }
 }
 
