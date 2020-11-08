@@ -108,7 +108,7 @@ class NoPackage() : Intent() {
 
 class NoRefund() : Intent() {
     override fun getExamples(lang: Language): List<String> {
-        return listOf("I didn't receive my refund", "No refund", "No refund received", "I'm not refunded", "I didn't receive a refund", "The last one", "The last problem", "The third one", "The third problem")
+        return listOf("I didn't receive my refund", "No refund","I didn't get a refund","No refund received", "I'm not refunded", "I didn't receive a refund", "The last one", "The last problem", "The third one", "The third problem")
     }
 }
 
