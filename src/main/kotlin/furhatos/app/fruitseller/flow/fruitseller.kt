@@ -144,7 +144,14 @@ val Start = state(Interaction) {
             goto (LookAround)
         }
         furhat.say("I can help when a package is late or lost, a wrong package is delivered, or a refund isn't received.")
-        furhat.ask("Do you have a question about any of these three problem specifically?")
+        furhat.ask("Is your question related to any of these three problems specifically?")
+    }
+
+    onReentry {
+        furhat.ask({random {
+            +"Is your question about one of these problems?"
+            +"Are you experiencing one of these problems?"
+        }})
     }
 
     onResponse<Yes> {
@@ -414,17 +421,17 @@ val TellStory = state(Interaction) {
 
 val ToldStory = state(Interaction) {
     onEntry {
-        furhat.say("This is unfortunate indeed. I'm sorry this happened.") // todo oude tekst: "This is indeed not the service we would have wanted to provide you with. I'm sorry this happened."
+        furhat.say("This is unfortunate indeed. I'm sorry this happened.")
         if (userEmotion == "Happy") {
             furhat.gesture(Gestures.BigSmile(strength = 0.7, duration = 2.0), async = true)
-            furhat.say ("Despite all this you still look optimistic. I admire that." ) // todo oude tekst: Looking at your smile it luckily appears to me that you are not greatly impacted by this problem.
+            furhat.say ("Despite all this you still look optimistic. I admire that." )
         } else if (userEmotion == "Unhappy") {
             furhat.gesture(Gestures.CloseEyes, async = true)
             furhat.gesture(Gestures.Shake( strength = 0.5), async = true)
             furhat.say ( "I understand that this whole ordeal has made you quite unhappy." )
             furhat.gesture(Gestures.OpenEyes, async = true)
         }
-        furhat.say("Let's fix this issue as soon as possible.") // todo oude tekst: "We'll fix this issue as soon as possible. I'll ask you some questions to make sure I have all necessary information."
+        furhat.say("Let's fix this issue as soon as possible.")
         goto(OrderAndName)
     }
 }
@@ -540,6 +547,14 @@ val LookUpOrder = state(Interaction) {
             furhat.ask("Is that right?")
     }
 
+    onReentry {
+        furhat.ask({random {
+            +"Is this the right order?"
+            +"Is this correct?"
+            +"Is this the order your question is about?"
+        }})
+    }
+
     onResponse<No> {
         //SAVE THAT PACKAGE IS WRONG
         goto(TryOrderAgain)
@@ -565,10 +580,10 @@ val LookForCause = state(Interaction) {
             var alright = furhat.askYN("Are you doing alright?")
             if (alright!!) {
                 furhat.say("Good to hear you're holding up. I'll try to fix the issue as fast as possible. " +
-                        "It will probably not take more than five minutes.")
+                        "It will probably not take more than a few minutes.")
             } else {
                 furhat.say("I'm sorry, I'll try to fix the issue as fast as possible. " +
-                        "It will probably not take more than five minutes.")
+                        "It will probably not take more than a few minutes.")
             }
         } else if (userEmotion == "Neutral") {
             furhat.say( "I hope you are satisfied with our support. Let's quickly finish this up." ) // oude tekst: "I'm glad you are not very upset about the issue you are experiencing. Let's quickly finish this up."
@@ -670,6 +685,12 @@ val OnItsWay = state(Interaction){
         furhat.gesture(Gestures.OpenEyes, async = true)
         furhat.say("As compensation I can send you a 20% discount coupon for your next order.")
         furhat.ask("Would you want that or do you prefer to return the order?")
+    }
+    onReentry {
+        furhat.ask({random {
+            +"Would you like a discount coupon or do you want to have the order returned?"
+            +"Would you like to receive a coupon or return the order?"
+        }})
     }
     onResponse<TooLate> {
         goto(ReturnPackage)
@@ -800,11 +821,20 @@ val SameOrder = state(Interaction){
     onEntry {
         furhat.ask("You've stated that you received a " +  users.current.book.receivedOrder +
                 ". It appears that what you intended to order has already been send to you, are " +
-                "you sure you meant a " + users.current.book.intendedOrder)
+                "you sure you meant a " + users.current.book.intendedOrder + "?")
     }
+
+    onReentry {
+        furhat.ask({random {
+            +"Are you sure this is what you meant?"
+            +("Are you sure you meant a " + users.current.book.intendedOrder + "?")
+        }})
+    }
+
     onResponse<No> {
         goto(IntendedOrder)
     }
+
     onResponse<Yes> {
         goto(CantHelp)
     }
@@ -814,6 +844,12 @@ val IntendedOrder = state(Interaction) {
     onEntry {
         furhat.ask("What did you intend to order? Please note that the only " +
                 "items we sell are laptops, TVs, Playstations, and headphones.")
+    }
+    onReentry {
+        furhat.ask({random {
+            +"What had you intended to order?"
+            +"Did you intend to order a laptop, TV, Playstation, or headphone?"
+        }})
     }
     onResponse<Headphones> {
         users.current.book.intendedOrder = "headphone"
@@ -856,6 +892,12 @@ val NewOrder = state(Interaction) {
             goto(LookQuestion)
         }
         furhat.ask("Is there a day this week you are home before 5 p.m.?")
+    }
+    onReentry {
+        furhat.ask({random {
+            +"Are you home before 5 p.m. any day this week?"
+            +"Could you please check this?"
+        }})
     }
     onResponse({listOf(NoDay(), No())}) {
         furhat.say ("That's ok, since free retour lasts 30 days there is still time left to return the " +
@@ -900,6 +942,13 @@ val ProductDamaged = state(Interaction) {
         furhat.ask("Let me just ask if you're sure the product was ok when you sent it?")
     }
 
+    onReentry {
+        furhat.ask({random {
+            +"Are you sure the product was intact when you sent it?"
+            +"Are you sure it nothing was broken last time you saw it?"
+        }})
+    }
+
     onResponse<Yes> {
         goto(NotifyLater)
     }
@@ -914,6 +963,13 @@ val ProductIncomplete = state(Interaction) {
         furhat.say("Apparently some components are missing. " +
                 "We are currently investing if the transportation company has had any part in this.")
         furhat.ask("Let me just ask if you are sure you didn't forget to return any loose parts?")
+    }
+
+    onReentry {
+        furhat.ask({random {
+            +"Are you sure about not forgetting any parts?"
+            +"Are you sure you did not forget any loose parts?"
+        }})
     }
 
     onResponse<Yes> {
@@ -951,9 +1007,18 @@ val RefundInMotion = state(Interaction){
         }
         furhat.ask("It looks like the product you returned has not arrived at our storage center yet. Did you mail it more than five days ago?")
     }
+
+    onReentry {
+        furhat.ask({random {
+            +"Have you mailed it over five days ago?"
+            +"Do you remember if you mailed if more than five days ago?"
+        }})
+    }
+
     onResponse<Yes> {
         goto(RefundNotFixed)
     }
+
     onResponse<No> {
         goto(RefundFixed)
     }
@@ -992,6 +1057,13 @@ val RefundFixed = state(Interaction) {
         furhat.ask(" Would you like to be contacted via e-mail, text message, or not at all?")
     }
 
+    onReentry {
+        furhat.ask({random {
+            +"How would you like to be contacted?"
+            +"Shall I contact you via e-mail, text message, or rather not at all?"
+        }})
+    }
+
     onResponse<EmailOrText> {
         furhat.say("Alright, noted. We'll be in touch soon.")
         furhat.say("I sincerely hope the package will just arrive in no time and " +
@@ -1016,6 +1088,13 @@ val AnythingElse = state(Interaction) {
         furhat.ask("Is there anything else I can do for you?")
     }
 
+    onReentry {
+        furhat.ask({random {
+            +"Can I help you with something else?"
+            +"Anything else you wanted to ask?"
+        }})
+    }
+
     onResponse<Yes> {
         if (userEmotion == "Unhappy") {
             furhat.gesture(Gestures.CloseEyes, async = true)
@@ -1023,7 +1102,7 @@ val AnythingElse = state(Interaction) {
             furhat.say("I'm sorry you are still unhappy with the whole situation")
             furhat.gesture(Gestures.OpenEyes, async = true)
         } else if (userEmotion == "Happy") {
-            furhat.say("I'm glad that I could be of service and it appears to me that you are satisfied with my support")
+            furhat.say("I'm glad that I could be of service and it appears to me that you are satisfied with my support.")
         }
         furhat.say("I think that one of my colleagues can be of better help, I'll put you through.")
     }
@@ -1064,6 +1143,13 @@ val FeedbackRating = state(Interaction) {
         }
         furhat.ask("Overall, how would you rate our previous conversation? Bad, ok, or good?")
     }
+    onReentry {
+        furhat.ask({random {
+            +"How would you rate it?"
+            +"Would you rate it bad, ok, or good?"
+            +"Do you think our conversation was bad, ok, or good?"
+        }})
+    }
     onResponse<Bad> {
         furhat.gesture(Gestures.Shake(strength = 0.2), async = false)
         goto(BadDoneDifferently)
@@ -1074,7 +1160,7 @@ val FeedbackRating = state(Interaction) {
     }
     onResponse<Good> {
         furhat.gesture(Gestures.Nod(strength = 0.2), async = true)
-        goto(likeMost)
+        goto(LikeMost)
     }
 }
 
@@ -1086,6 +1172,13 @@ val BadDoneDifferently = state(Interaction){
             goto(LookQuestion)
         }
         furhat.ask("What would you like to see differently next time?")
+    }
+    onReentry {
+        furhat.ask({random {
+            +"What could I do differently?"
+            +"What could I do better next time?"
+            +"Which tips do you have for me?"
+        }})
     }
     onResponse {
         goto(AgreeAndPositive)
@@ -1101,13 +1194,20 @@ val OKDoneDifferently = state(Interaction){
         }
         furhat.ask("What could I have done differently so that you would have rated the conversation as good?" )
     }
+    onReentry {
+        furhat.ask({random {
+            +"What could I do differently?"
+            +"What could I do better next time?"
+            +"Which tips do you have for me?"
+        }})
+    }
     onResponse {
         goto(AgreeAndPositive)
     }
 }
 
 
-val likeMost = state(Interaction){
+val LikeMost = state(Interaction){
     onEntry {
 
         furhat.say ( "That's nice to hear.")
@@ -1116,6 +1216,12 @@ val likeMost = state(Interaction){
         }
         furhat.ask("What did you like most about it?" )
     }
+    onReentry {
+        furhat.ask({random {
+            +"Which part did you like the most?"
+            +"What did you like most about our conversation?"
+        }})
+    }
     onResponse {
         goto(BetterNextTime)
     }
@@ -1123,14 +1229,18 @@ val likeMost = state(Interaction){
 
 val BetterNextTime = state(Interaction){
     onEntry {
-        furhat.ask("")
-    }
-    onResponse {
-        furhat.say("Thank you!")
+        furhat.say("Thank you.")
         parallel {
             goto(LookQuestion)
         }
         furhat.ask("Was there also anything that I could do better next time?")
+    }
+    onReentry {
+        furhat.ask({random {
+            +"What could I still do better?"
+            +"Which part can I improve on a bit more?"
+            +"Which tips do you have for me?"
+        }})
     }
     onResponse {
         goto(TakeInAccount)
@@ -1145,6 +1255,12 @@ val AgreeAndPositive = state(Interaction){
             goto(LookQuestion)
         }
         furhat.ask("Was there also something that you liked about our conversation?")
+    }
+    onReentry {
+        furhat.ask({random {
+            +"Was there something you liked?"
+            +"Was there perhaps also something that you liked about the conversation?"
+        }})
     }
     onResponse {
         goto(TakeInAccount)

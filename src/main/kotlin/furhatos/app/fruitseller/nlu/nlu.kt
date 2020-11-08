@@ -132,7 +132,7 @@ class Bad() : Intent() {
 
 class Ok() : Intent() {
     override fun getExamples(lang: Language): List<String> {
-        return listOf("Ok", "Alright", "Not too bad", "Fine", "Average", "Okay", "Standard", "Fair")
+        return listOf("Ok", "Alright", "Not too bad", "Fine", "Average", "Okay", "Standard", "Fair", "Neutral")
     }
 }
 
