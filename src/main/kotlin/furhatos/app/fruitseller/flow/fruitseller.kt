@@ -140,11 +140,73 @@ val Start = state(Interaction) {
         }
         furhat.attend(user = users.random)
         furhat.say("Hello! Welcome to the live support of Bol.com. My name is Furhat and I will be assisting you today. ")
-
         parallel {
             goto (LookAround)
         }
         furhat.say("I can help when a package is late or lost, a wrong package is delivered, or a refund isn't received.")
+        furhat.ask("Do you have a question about any of these three problem specifically?")
+    }
+
+    onResponse<Yes> {
+        goto(SpecifyProblem)
+    }
+
+    onResponse<No> {
+        furhat.gesture(Gestures.ExpressSad(strength = 10.0), async = true)
+        furhat.say("Unfortunately, I can only support you with these specific problems.")
+        if (userEmotion == "Unhappy") {
+            furhat.gesture(Gestures.Blink( strength = 2.0), async = true)
+            furhat.gesture(Gestures.Shake( strength = 0.1), async = true)
+            furhat.say("I'm sorry I couldn't be of more help today.")
+            furhat.say("I'm sure my colleagues could fix the issue for you within no time.")
+            furhat.gesture(Gestures.Smile(strength = 1.5), async = true)
+        }
+        goto(transfer)
+    }
+
+    onResponse<WrongPackage> {
+        users.current.book.problem = "received the wrong package"
+        goto(Problem)
+
+    }
+    onResponse<NoPackage> {
+        users.current.book.problem = "didn't receive the package"
+        goto(Problem)
+    }
+    onResponse<NoRefund> {
+        users.current.book.problem = "didn't receive a refund"
+        goto(Problem)
+    }
+}
+
+val transfer = state(Interaction) {
+    onEntry {
+        furhat.ask("Would you like me to transfer you to one of my colleagues?")
+    }
+
+    onResponse<Yes> {
+        furhat.say {
+            +"Alright, I'll transfer you to my colleague "
+            random {
+                +"Thomas."
+                +"Laura."
+                +"James."
+                +"Emma."
+            }
+            +"It will just be a second."
+        }
+        TimeUnit.SECONDS.sleep(1)
+        furhat.say("Goodbye.")
+    }
+
+    onResponse<No> {
+        furhat.say("Sure, no problem. If you would like to contact them later, their telephone number is 030 310 49 99.")
+        furhat.say("Goodbye.")
+    }
+}
+
+val SpecifyProblem = state(Interaction) {
+    onEntry {
         parallel {
             goto (LookQuestion)
         }
@@ -296,11 +358,7 @@ val NoStory = state(Interaction) {
         furhat.gesture(Gestures.Nod(strength = 0.5));
         furhat.say("Ok, let's focus on fixing this issue immediately.")
         if (userEmotion == "Unhappy") {
-            // TODO previous version deleten?
-            //furhat.gesture(Gestures.CloseEyes, async = true)
-            //furhat.gesture(Gestures.Shake( strength = 0.5), async = true)
-            //furhat.say("I'll do my utmost best for you.") // todo oude tekst:  hope you won't be unhappy anymore if we get this issue out of the way quickly
-            //furhat.gesture(Gestures.OpenEyes, async = true)
+            furhat.gesture(Gestures.Nod(strength = 0.3), async = true)
             furhat.gesture(Gestures.Thoughtful( strength = 2.0), async = true)
             furhat.say("I'll do my utmost best for you.")
             furhat.gesture(Gestures.GazeAway( strength = 0.4), async = true)
