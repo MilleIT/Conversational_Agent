@@ -371,7 +371,7 @@ val NoStory = state(Interaction) {
             furhat.gesture(Gestures.GazeAway( strength = 0.4), async = true)
             TimeUnit.SECONDS.sleep(1)
         }
-        goto(OrderAndName)
+        goto(OrderNumber)
     }
 }
 
@@ -432,18 +432,18 @@ val ToldStory = state(Interaction) {
             furhat.gesture(Gestures.OpenEyes, async = true)
         }
         furhat.say("Let's fix this issue as soon as possible.")
-        goto(OrderAndName)
+        goto(OrderNumber)
     }
 }
 
-val OrderAndName = state(Interaction) {
+val OrderNumber = state(Interaction) {
     onEntry {
         parallel {
             goto(LookQuestion) // TODO hij crashed hier heel soms en blijft vast zitten op de attend
         }
         furhat.ask({random {
-            +"Can I have your order number and first name please?"
-            +"Would you like to share your order number and first name?"
+            +"Can I have your order number please?"
+            +"Could you share your order number?"
         }})
     }
 
@@ -453,9 +453,8 @@ val OrderAndName = state(Interaction) {
         furhat.gesture(Gestures.Thoughtful, async = true)
     }
 
-    onResponse<OrderAndName> {
-        //Store Order and Last name
-        goto(LookUpOrder)
+    onResponse<OrderNumber> {
+        goto(FirstName)
     }
 
     onResponse<No> {
@@ -482,13 +481,67 @@ val OrderAndName = state(Interaction) {
 
     onResponse {
         furhat.say({random {
-            +"Sorry, I don't think I heard you right. Which order number and first name did you say?"
+            +"Sorry, I don't think I heard you right. Which order number did you say?"
+            +"Could you say that again? I don't think I heard the right order number."
+            +"Sorry, can you repeat the order number?"
+            +"I think I misheard you, could you repeat the order number?"
+            +"I didn't catch an order number. Could you repeat it please?"
+        }})
+        reentry()
+    }
+
+    var noresponse = 0
+    onNoResponse {
+        noresponse++
+        if (noresponse > 3)
+            furhat.say("Perhaps another time is better. Don't worry about it. You can contact me 24/7.")
+        else if (noresponse > 2) {
+            furhat.say({random {
+                +"Are you still there?"
+                +"Are you there?"
+                +"Are you able to continue our conversation?"
+            }})
+            reentry()
+        }
+        else if (noresponse > 1) {
+            furhat.say({random {
+                +"I'm sorry, I still didn't hear you."
+                +"Hmm, I still didn't hear you."
+            }})
+            reentry()
+        }
+        else {
+            furhat.say({random {
+                +"Sorry, I don't think I heard you."
+                +"Sorry, I didn't hear you."
+            }})
+            reentry()
+        }
+    }
+}
+
+val FirstName = state(Interaction) {
+    onEntry {
+        parallel {
+            goto(LookQuestion)
+        }
+        furhat.ask({random {
+            +"And what is your first name?"
+            +"And your first name as well please."
+        }})
+    }
+
+    onResponse<FirstName> {
+        goto(LookUpOrder)
+    }
+
+    onResponse {
+        furhat.say({random {
+            +"Sorry, I don't think I heard you right. Which name did you say?"
             +"Could you say that again? I don't think I heard you right."
-            +"I don't think I understood you. Could you perhaps repeat that?"
-            +"Sorry, can you repeat what you just said?"
-            +"I think I misheard you, could you repeat the order number and first  name?"
-            +"Sorry, I didn't hear an order number and first name."
-            +"I didn't catch an order number and first name. Could you repeat it please?"
+            +"I think I misheard you, could you repeat your first name?"
+            +"Sorry, I didn't hear your name."
+            +"I didn't catch your first name. Could you repeat it please?"
         }})
         reentry()
     }

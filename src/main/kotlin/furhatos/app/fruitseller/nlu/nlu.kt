@@ -112,15 +112,15 @@ class NoRefund() : Intent() {
     }
 }
 
-class OrderAndName(var ordernumber : Number? = null, var name : PersonName? = null) : Intent() {
+class OrderNumber(var ordernumber : Number? = null) : Intent() {
     override fun getExamples(lang: Language): List<String> {
-        return listOf("@ordernumber, @name", "My ordernumber is @ordernumber and my last name is @name")
+        return listOf("@ordernumber", "My ordernumber is @ordernumber", "Ordernumber is @ordernumber", "The ordernumber is @ordernumber", "That's @ordernumber")
     }
 }
 
-class OrderNumber(var ordernumber : Number? = null) : Intent() {
+class FirstName(var name : PersonName? = null) : Intent() {
     override fun getExamples(lang: Language): List<String> {
-        return listOf("@ordernumber", "My ordernumber is @ordernumber")
+        return listOf("@name", "My name is @name", "My first name is @name", "First name is @name", "Name is @name", "That's @name")
     }
 }
 
