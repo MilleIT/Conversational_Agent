@@ -730,7 +730,7 @@ val CancelOrder = state(Interaction) {
 
 val ContinueOrder = state(Interaction) {
     onEntry {
-        furhat.say("Alright I have placed your order. You will receive a confirmation e-mail.")
+        furhat.say("Alright, I've placed your order. You will receive a confirmation e-mail.")
         furhat.say("Also, we will send it express, so you can expect your package to arrive tomorrow.")
         furhat.ask("Is tomorrow convenient for you?")
     }
@@ -897,7 +897,7 @@ val ProductDamaged = state(Interaction) {
     onEntry {
         furhat.say("Apparently the product has arrived damaged. We are currently investing if the " +
                 "transportation company has had any part in this.")
-        furhat.say("Let me just ask if you're sure the product was ok when you sent it?")
+        furhat.ask("Let me just ask if you're sure the product was ok when you sent it?")
     }
 
     onResponse<Yes> {
@@ -913,7 +913,7 @@ val ProductIncomplete = state(Interaction) {
     onEntry {
         furhat.say("Apparently some components are missing. " +
                 "We are currently investing if the transportation company has had any part in this.")
-        furhat.say("Let me just ask if you are sure you didn't forget to return any loose parts?")
+        furhat.ask("Let me just ask if you are sure you didn't forget to return any loose parts?")
     }
 
     onResponse<Yes> {
@@ -1035,6 +1035,7 @@ val AnythingElse = state(Interaction) {
 
 val AskForFeedback = state(Interaction) {
     onEntry {
+        furhat.say("As you know I'm a bot that is ever improving.")
         if (userEmotion == "Unhappy") {
             furhat.say("I've noticed you are unhappy. I would like to know what could have caused this.")
         } else if (userEmotion == "Neutral") {
@@ -1042,7 +1043,7 @@ val AskForFeedback = state(Interaction) {
         } else if (userEmotion == "Happy") {
             furhat.say("I've noticed you are happy. It would be great if you told me what caused you to be happy.")
         }
-        var givesFeedback = furhat.askYN("As you know I'm a bot that is ever improving. Would you be willing to give me " +
+        var givesFeedback = furhat.askYN("Would you be willing to give me " +
                 "some tips so that I can provide you with a better service in the future?")
         if(givesFeedback!!) {
             goto(FeedbackRating)
