@@ -151,6 +151,7 @@ val Start = state(Interaction) {
         furhat.ask({random {
             +"Is your question about one of these problems?"
             +"Are you experiencing one of these problems?"
+            +""
         }})
     }
 
@@ -184,11 +185,52 @@ val Start = state(Interaction) {
         users.current.book.problem = "didn't receive a refund"
         goto(Problem)
     }
+
+    var noresponse = 0
+    onNoResponse {
+        noresponse++
+        if (noresponse > 3) {
+            furhat.gesture(Gestures.Thoughtful(strength = 1.0), async = true)
+            furhat.say("Perhaps another time is better. Don't worry about it, you can contact me 24/7.")
+        }
+        else if (noresponse > 2) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.ask({random {
+                +"Are you still there?"
+                +"Are you there?"
+                +"Are you able to continue our conversation?"
+            }})
+        }
+        else if (noresponse > 1) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"I'm sorry, I still didn't hear you."
+                +"Hmm, I still didn't hear you."
+            }})
+            reentry()
+        }
+        else {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"Sorry, I don't think I heard you."
+                +"Sorry, I didn't hear you."
+            }})
+            reentry()
+        }
+    }
 }
 
 val transfer = state(Interaction) {
     onEntry {
         furhat.ask("Would you like me to transfer you to one of my colleagues?")
+    }
+
+    onReentry {
+        furhat.ask({random {
+            +"Shall I transer you?"
+            +"Would you like to be transferred?"
+            +""
+        }})
     }
 
     onResponse<Yes> {
@@ -210,6 +252,39 @@ val transfer = state(Interaction) {
         furhat.say("Sure, no problem. If you would like to contact them later, their telephone number is 030 310 49 99.")
         furhat.say("Goodbye.")
     }
+
+    var noresponse = 0
+    onNoResponse {
+        noresponse++
+        if (noresponse > 3) {
+            furhat.gesture(Gestures.Thoughtful(strength = 1.0), async = true)
+            furhat.say("Perhaps another time is better. Don't worry about it, you can contact me 24/7.")
+        }
+        else if (noresponse > 2) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.ask({random {
+                +"Are you still there?"
+                +"Are you there?"
+                +"Are you able to continue our conversation?"
+            }})
+        }
+        else if (noresponse > 1) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"I'm sorry, I still didn't hear you."
+                +"Hmm, I still didn't hear you."
+            }})
+            reentry()
+        }
+        else {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"Sorry, I don't think I heard you."
+                +"Sorry, I didn't hear you."
+            }})
+            reentry()
+        }
+    }
 }
 
 val SpecifyProblem = state(Interaction) {
@@ -228,6 +303,7 @@ val SpecifyProblem = state(Interaction) {
             +"How can I help you?"
             +"What went wrong with your order?"
             +"Please tell me what problem you are experiencing."
+            +""
         }})
         furhat.gesture(Gestures.Thoughtful, async = true)
     }
@@ -250,17 +326,20 @@ val SpecifyProblem = state(Interaction) {
     var noresponse = 0
     onNoResponse {
         noresponse++
-        if (noresponse > 3)
+        if (noresponse > 3) {
+            furhat.gesture(Gestures.Thoughtful(strength = 1.0), async = true)
             furhat.say("Perhaps another time is better. Don't worry about it, you can contact me 24/7.")
+        }
         else if (noresponse > 2) {
-            furhat.say({random {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.ask({random {
                 +"Are you still there?"
                 +"Are you there?"
                 +"Are you able to continue our conversation?"
             }})
-            reentry()
         }
         else if (noresponse > 1) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
             furhat.say({random {
                 +"I'm sorry, I still didn't hear you."
                 +"Hmm, I still didn't hear you."
@@ -268,6 +347,7 @@ val SpecifyProblem = state(Interaction) {
             reentry()
         }
         else {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
             furhat.say({random {
                 +"Sorry, I don't think I heard you."
                 +"Sorry, I didn't hear you."
@@ -336,25 +416,32 @@ val Problem = state(Interaction) {
     var noresponse = 0
     onNoResponse {
         noresponse++
-        if (noresponse > 3)
-            furhat.say("Perhaps another time is better. Don't worry about it. You can contact me 24/7.")
+        if (noresponse > 3) {
+            furhat.gesture(Gestures.Thoughtful(strength = 1.0), async = true)
+            furhat.say("Perhaps another time is better. Don't worry about it, you can contact me 24/7.")
+        }
         else if (noresponse > 2) {
-            furhat.say({random {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.ask({random {
                 +"Are you still there?"
                 +"Are you there?"
                 +"Are you able to continue our conversation?"
             }})
-            reentry()
         }
         else if (noresponse > 1) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
             furhat.say({random {
-                +"I'm sorry, I didn't hear you."
-                +"Hmm, I didn't hear you."
+                +"I'm sorry, I still didn't hear you."
+                +"Hmm, I still didn't hear you."
             }})
             reentry()
         }
         else {
-            furhat.ask("Would you prefer to continue or elaborate?")
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"Sorry, I don't think I heard you."
+                +"Sorry, I didn't hear you."
+            }})
             reentry()
         }
     }
@@ -493,17 +580,20 @@ val OrderNumber = state(Interaction) {
     var noresponse = 0
     onNoResponse {
         noresponse++
-        if (noresponse > 3)
-            furhat.say("Perhaps another time is better. Don't worry about it. You can contact me 24/7.")
+        if (noresponse > 3) {
+            furhat.gesture(Gestures.Thoughtful(strength = 1.0), async = true)
+            furhat.say("Perhaps another time is better. Don't worry about it, you can contact me 24/7.")
+        }
         else if (noresponse > 2) {
-            furhat.say({random {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.ask({random {
                 +"Are you still there?"
                 +"Are you there?"
                 +"Are you able to continue our conversation?"
             }})
-            reentry()
         }
         else if (noresponse > 1) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
             furhat.say({random {
                 +"I'm sorry, I still didn't hear you."
                 +"Hmm, I still didn't hear you."
@@ -511,6 +601,7 @@ val OrderNumber = state(Interaction) {
             reentry()
         }
         else {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
             furhat.say({random {
                 +"Sorry, I don't think I heard you."
                 +"Sorry, I didn't hear you."
@@ -549,17 +640,20 @@ val FirstName = state(Interaction) {
     var noresponse = 0
     onNoResponse {
         noresponse++
-        if (noresponse > 3)
-            furhat.say("Perhaps another time is better. Don't worry about it. You can contact me 24/7.")
+        if (noresponse > 3) {
+            furhat.gesture(Gestures.Thoughtful(strength = 1.0), async = true)
+            furhat.say("Perhaps another time is better. Don't worry about it, you can contact me 24/7.")
+        }
         else if (noresponse > 2) {
-            furhat.say({random {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.ask({random {
                 +"Are you still there?"
                 +"Are you there?"
                 +"Are you able to continue our conversation?"
             }})
-            reentry()
         }
         else if (noresponse > 1) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
             furhat.say({random {
                 +"I'm sorry, I still didn't hear you."
                 +"Hmm, I still didn't hear you."
@@ -567,6 +661,7 @@ val FirstName = state(Interaction) {
             reentry()
         }
         else {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
             furhat.say({random {
                 +"Sorry, I don't think I heard you."
                 +"Sorry, I didn't hear you."
@@ -605,15 +700,48 @@ val LookUpOrder = state(Interaction) {
             +"Is this the right order?"
             +"Is this correct?"
             +"Is this the order your question is about?"
+            +""
         }})
     }
 
     onResponse<No> {
-        //SAVE THAT PACKAGE IS WRONG
         goto(TryOrderAgain)
     }
     onResponse<Yes> {
         goto(LookForCause)
+    }
+
+    var noresponse = 0
+    onNoResponse {
+        noresponse++
+        if (noresponse > 3) {
+            furhat.gesture(Gestures.Thoughtful(strength = 1.0), async = true)
+            furhat.say("Perhaps another time is better. Don't worry about it, you can contact me 24/7.")
+        }
+        else if (noresponse > 2) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.ask({random {
+                +"Are you still there?"
+                +"Are you there?"
+                +"Are you able to continue our conversation?"
+            }})
+        }
+        else if (noresponse > 1) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"I'm sorry, I still didn't hear you."
+                +"Hmm, I still didn't hear you."
+            }})
+            reentry()
+        }
+        else {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"Sorry, I don't think I heard you."
+                +"Sorry, I didn't hear you."
+            }})
+            reentry()
+        }
     }
 }
 
@@ -670,6 +798,12 @@ val TryOrderAgain = state(Interaction) {
         furhat.attend(Loc())
     }
 
+    onReentry {
+        furhat.ask({random {
+            +"What is your order number again?"
+            +""
+        }})
+    }
     onResponse<OrderNumber> {
         goto(FoundOrder)
     }
@@ -705,6 +839,38 @@ val TryOrderAgain = state(Interaction) {
         }})
     }
 
+    var noresponse = 0
+    onNoResponse {
+        noresponse++
+        if (noresponse > 3) {
+            furhat.gesture(Gestures.Thoughtful(strength = 1.0), async = true)
+            furhat.say("Perhaps another time is better. Don't worry about it, you can contact me 24/7.")
+        }
+        else if (noresponse > 2) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.ask({random {
+                +"Are you still there?"
+                +"Are you there?"
+                +"Are you able to continue our conversation?"
+            }})
+        }
+        else if (noresponse > 1) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"I'm sorry, I still didn't hear you."
+                +"Hmm, I still didn't hear you."
+            }})
+            reentry()
+        }
+        else {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"Sorry, I don't think I heard you."
+                +"Sorry, I didn't hear you."
+            }})
+            reentry()
+        }
+    }
 }
 
 val FoundOrder = state(Interaction) {
@@ -743,6 +909,7 @@ val OnItsWay = state(Interaction){
         furhat.ask({random {
             +"Would you like a discount coupon or do you want to have the order returned?"
             +"Would you like to receive a coupon or return the order?"
+            +""
         }})
     }
     onResponse<TooLate> {
@@ -761,6 +928,39 @@ val OnItsWay = state(Interaction){
             furhat.say("Ah I misunderstood, I hope you can still enjoy the product even though it arrives late.")
             furhat.say("You will receive the discount in your e-mail today.")
             goto(AnythingElse)
+        }
+    }
+
+    var noresponse = 0
+    onNoResponse {
+        noresponse++
+        if (noresponse > 3) {
+            furhat.gesture(Gestures.Thoughtful(strength = 1.0), async = true)
+            furhat.say("Perhaps another time is better. Don't worry about it, you can contact me 24/7.")
+        }
+        else if (noresponse > 2) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.ask({random {
+                +"Are you still there?"
+                +"Are you there?"
+                +"Are you able to continue our conversation?"
+            }})
+        }
+        else if (noresponse > 1) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"I'm sorry, I still didn't hear you."
+                +"Hmm, I still didn't hear you."
+            }})
+            reentry()
+        }
+        else {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"Sorry, I don't think I heard you."
+                +"Sorry, I didn't hear you."
+            }})
+            reentry()
         }
     }
 }
@@ -784,11 +984,53 @@ val NotSentYet = state(Interaction) {
         }
         furhat.ask("Would you still like to receive the product or would you like to cancel your order? ")
     }
+
+    onReentry {
+        furhat.ask({random {
+            +"Do you prefer to receive or cancel the order?"
+            +"Would you like to still receive the product or rather cancel it?"
+            +""
+        }})
+    }
+
     onResponse<Cancel> {
         goto(CancelOrder)
     }
     onResponse<StillReceive> {
         goto(ContinueOrder)
+    }
+
+    var noresponse = 0
+    onNoResponse {
+        noresponse++
+        if (noresponse > 3) {
+            furhat.gesture(Gestures.Thoughtful(strength = 1.0), async = true)
+            furhat.say("Perhaps another time is better. Don't worry about it, you can contact me 24/7.")
+        }
+        else if (noresponse > 2) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.ask({random {
+                +"Are you still there?"
+                +"Are you there?"
+                +"Are you able to continue our conversation?"
+            }})
+        }
+        else if (noresponse > 1) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"I'm sorry, I still didn't hear you."
+                +"Hmm, I still didn't hear you."
+            }})
+            reentry()
+        }
+        else {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"Sorry, I don't think I heard you."
+                +"Sorry, I didn't hear you."
+            }})
+            reentry()
+        }
     }
 }
 
@@ -808,6 +1050,13 @@ val ContinueOrder = state(Interaction) {
         furhat.say("Also, we will send it express, so you can expect your package to arrive tomorrow.")
         furhat.ask("Is tomorrow convenient for you?")
     }
+    onReentry {
+        furhat.ask({random {
+            +"Would you be available tomorrow?"
+            +"Does tomorrow work for you?"
+            +""
+        }})
+    }
     onResponse<NotHome> {
         goto(DeliveryDate)
     }
@@ -816,6 +1065,38 @@ val ContinueOrder = state(Interaction) {
     }
     onResponse<Yes> {
         goto(AnythingElse)
+    }
+    var noresponse = 0
+    onNoResponse {
+        noresponse++
+        if (noresponse > 3) {
+            furhat.gesture(Gestures.Thoughtful(strength = 1.0), async = true)
+            furhat.say("Perhaps another time is better. Don't worry about it, you can contact me 24/7.")
+        }
+        else if (noresponse > 2) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.ask({random {
+                +"Are you still there?"
+                +"Are you there?"
+                +"Are you able to continue our conversation?"
+            }})
+        }
+        else if (noresponse > 1) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"I'm sorry, I still didn't hear you."
+                +"Hmm, I still didn't hear you."
+            }})
+            reentry()
+        }
+        else {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"Sorry, I don't think I heard you."
+                +"Sorry, I didn't hear you."
+            }})
+            reentry()
+        }
     }
 }
 
@@ -837,7 +1118,15 @@ val WrongPackage = state(Interaction) {
         }
         furhat.ask("Could you tell me what you intended to order? " +
                     "Please note that the only items we sell are laptops, TVs, Playstations, and headphones." )
-        }
+    }
+
+    onReentry {
+        furhat.ask({random {
+            +"What did you intent to order?"
+            +"Did you intent to order a laptop, TV, Playstation or headphone?"
+        }})
+    }
+
     onResponse<Headphones> {
         users.current.book.intendedOrder = "headphone"
         if( users.current.book.intendedOrder == users.current.book.receivedOrder){
@@ -846,26 +1135,64 @@ val WrongPackage = state(Interaction) {
             goto(NewOrder)
         }
     }
+
     onResponse<Television> {
         users.current.book.intendedOrder = "television"
-        if( users.current.book.intendedOrder == users.current.book.receivedOrder){
+        if (users.current.book.intendedOrder == users.current.book.receivedOrder) {
             goto(SameOrder)
-        }else{
+        } else {
             goto(NewOrder)
-        }    }
+        }
+    }
+
     onResponse<Laptop> {
         users.current.book.intendedOrder = "laptop"
-        if( users.current.book.intendedOrder == users.current.book.receivedOrder){
+        if (users.current.book.intendedOrder == users.current.book.receivedOrder) {
             goto(SameOrder)
-        }else{
+        } else {
             goto(NewOrder)
-        }    }
+        }
+    }
+
     onResponse<Playstation> {
         users.current.book.intendedOrder = "playstation"
-        if( users.current.book.intendedOrder == users.current.book.receivedOrder){
+        if (users.current.book.intendedOrder == users.current.book.receivedOrder) {
             goto(SameOrder)
-        }else{
+        } else {
             goto(NewOrder)
+        }
+    }
+
+    var noresponse = 0
+    onNoResponse {
+        noresponse++
+        if (noresponse > 3) {
+            furhat.gesture(Gestures.Thoughtful(strength = 1.0), async = true)
+            furhat.say("Perhaps another time is better. Don't worry about it, you can contact me 24/7.")
+        }
+        else if (noresponse > 2) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.ask({random {
+                +"Are you still there?"
+                +"Are you there?"
+                +"Are you able to continue our conversation?"
+            }})
+        }
+        else if (noresponse > 1) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"I'm sorry, I still didn't hear you."
+                +"Hmm, I still didn't hear you."
+            }})
+            reentry()
+        }
+        else {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"Sorry, I don't think I heard you."
+                +"Sorry, I didn't hear you."
+            }})
+            reentry()
         }
     }
 }
@@ -891,6 +1218,39 @@ val SameOrder = state(Interaction){
     onResponse<Yes> {
         goto(CantHelp)
     }
+
+    var noresponse = 0
+    onNoResponse {
+        noresponse++
+        if (noresponse > 3) {
+            furhat.gesture(Gestures.Thoughtful(strength = 1.0), async = true)
+            furhat.say("Perhaps another time is better. Don't worry about it, you can contact me 24/7.")
+        }
+        else if (noresponse > 2) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.ask({random {
+                +"Are you still there?"
+                +"Are you there?"
+                +"Are you able to continue our conversation?"
+            }})
+        }
+        else if (noresponse > 1) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"I'm sorry, I still didn't hear you."
+                +"Hmm, I still didn't hear you."
+            }})
+            reentry()
+        }
+        else {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"Sorry, I don't think I heard you."
+                +"Sorry, I didn't hear you."
+            }})
+            reentry()
+        }
+    }
 }
 
 val IntendedOrder = state(Interaction) {
@@ -898,12 +1258,14 @@ val IntendedOrder = state(Interaction) {
         furhat.ask("What did you intend to order? Please note that the only " +
                 "items we sell are laptops, TVs, Playstations, and headphones.")
     }
+
     onReentry {
         furhat.ask({random {
             +"What had you intended to order?"
             +"Did you intend to order a laptop, TV, Playstation, or headphone?"
         }})
     }
+
     onResponse<Headphones> {
         users.current.book.intendedOrder = "headphone"
             goto(NewOrder)
@@ -919,6 +1281,38 @@ val IntendedOrder = state(Interaction) {
     onResponse<Playstation> {
         users.current.book.intendedOrder = "playstation"
             goto(NewOrder)
+    }
+    var noresponse = 0
+    onNoResponse {
+        noresponse++
+        if (noresponse > 3) {
+            furhat.gesture(Gestures.Thoughtful(strength = 1.0), async = true)
+            furhat.say("Perhaps another time is better. Don't worry about it, you can contact me 24/7.")
+        }
+        else if (noresponse > 2) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.ask({random {
+                +"Are you still there?"
+                +"Are you there?"
+                +"Are you able to continue our conversation?"
+            }})
+        }
+        else if (noresponse > 1) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"I'm sorry, I still didn't hear you."
+                +"Hmm, I still didn't hear you."
+            }})
+            reentry()
+        }
+        else {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"Sorry, I don't think I heard you."
+                +"Sorry, I didn't hear you."
+            }})
+            reentry()
+        }
     }
 }
 
@@ -961,6 +1355,39 @@ val NewOrder = state(Interaction) {
     }
     onResponse<Yes> {
         goto(WhatDay)
+    }
+
+    var noresponse = 0
+    onNoResponse {
+        noresponse++
+        if (noresponse > 3) {
+            furhat.gesture(Gestures.Thoughtful(strength = 1.0), async = true)
+            furhat.say("Perhaps another time is better. Don't worry about it, you can contact me 24/7.")
+        }
+        else if (noresponse > 2) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.ask({random {
+                +"Are you still there?"
+                +"Are you there?"
+                +"Are you able to continue our conversation?"
+            }})
+        }
+        else if (noresponse > 1) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"I'm sorry, I still didn't hear you."
+                +"Hmm, I still didn't hear you."
+            }})
+            reentry()
+        }
+        else {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"Sorry, I don't think I heard you."
+                +"Sorry, I didn't hear you."
+            }})
+            reentry()
+        }
     }
 }
 
@@ -1009,6 +1436,39 @@ val ProductDamaged = state(Interaction) {
     onResponse<No> {
         goto(ReferToColleague)
     }
+
+    var noresponse = 0
+    onNoResponse {
+        noresponse++
+        if (noresponse > 3) {
+            furhat.gesture(Gestures.Thoughtful(strength = 1.0), async = true)
+            furhat.say("Perhaps another time is better. Don't worry about it, you can contact me 24/7.")
+        }
+        else if (noresponse > 2) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.ask({random {
+                +"Are you still there?"
+                +"Are you there?"
+                +"Are you able to continue our conversation?"
+            }})
+        }
+        else if (noresponse > 1) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"I'm sorry, I still didn't hear you."
+                +"Hmm, I still didn't hear you."
+            }})
+            reentry()
+        }
+        else {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"Sorry, I don't think I heard you."
+                +"Sorry, I didn't hear you."
+            }})
+            reentry()
+        }
+    }
 }
 
 val ProductIncomplete = state(Interaction) {
@@ -1033,6 +1493,38 @@ val ProductIncomplete = state(Interaction) {
         goto(ReferToColleague)
     }
 
+    var noresponse = 0
+    onNoResponse {
+        noresponse++
+        if (noresponse > 3) {
+            furhat.gesture(Gestures.Thoughtful(strength = 1.0), async = true)
+            furhat.say("Perhaps another time is better. Don't worry about it, you can contact me 24/7.")
+        }
+        else if (noresponse > 2) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.ask({random {
+                +"Are you still there?"
+                +"Are you there?"
+                +"Are you able to continue our conversation?"
+            }})
+        }
+        else if (noresponse > 1) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"I'm sorry, I still didn't hear you."
+                +"Hmm, I still didn't hear you."
+            }})
+            reentry()
+        }
+        else {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"Sorry, I don't think I heard you."
+                +"Sorry, I didn't hear you."
+            }})
+            reentry()
+        }
+    }
 }
 
 val ReferToColleague = state(Interaction) {
@@ -1074,6 +1566,39 @@ val RefundInMotion = state(Interaction){
 
     onResponse<No> {
         goto(RefundFixed)
+    }
+
+    var noresponse = 0
+    onNoResponse {
+        noresponse++
+        if (noresponse > 3) {
+            furhat.gesture(Gestures.Thoughtful(strength = 1.0), async = true)
+            furhat.say("Perhaps another time is better. Don't worry about it, you can contact me 24/7.")
+        }
+        else if (noresponse > 2) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.ask({random {
+                +"Are you still there?"
+                +"Are you there?"
+                +"Are you able to continue our conversation?"
+            }})
+        }
+        else if (noresponse > 1) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"I'm sorry, I still didn't hear you."
+                +"Hmm, I still didn't hear you."
+            }})
+            reentry()
+        }
+        else {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"Sorry, I don't think I heard you."
+                +"Sorry, I didn't hear you."
+            }})
+            reentry()
+        }
     }
 }
 
@@ -1131,6 +1656,38 @@ val RefundFixed = state(Interaction) {
         goto(AnythingElse)
     }
 
+    var noresponse = 0
+    onNoResponse {
+        noresponse++
+        if (noresponse > 3) {
+            furhat.gesture(Gestures.Thoughtful(strength = 1.0), async = true)
+            furhat.say("Perhaps another time is better. Don't worry about it, you can contact me 24/7.")
+        }
+        else if (noresponse > 2) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.ask({random {
+                +"Are you still there?"
+                +"Are you there?"
+                +"Are you able to continue our conversation?"
+            }})
+        }
+        else if (noresponse > 1) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"I'm sorry, I still didn't hear you."
+                +"Hmm, I still didn't hear you."
+            }})
+            reentry()
+        }
+        else {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"Sorry, I don't think I heard you."
+                +"Sorry, I didn't hear you."
+            }})
+            reentry()
+        }
+    }
 }
 
 val AnythingElse = state(Interaction) {
@@ -1162,6 +1719,39 @@ val AnythingElse = state(Interaction) {
 
     onResponse<No> {
         goto(AskForFeedback)
+    }
+
+    var noresponse = 0
+    onNoResponse {
+        noresponse++
+        if (noresponse > 3) {
+            furhat.gesture(Gestures.Thoughtful(strength = 1.0), async = true)
+            furhat.say("Perhaps another time is better. Don't worry about it, you can contact me 24/7.")
+        }
+        else if (noresponse > 2) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.ask({random {
+                +"Are you still there?"
+                +"Are you there?"
+                +"Are you able to continue our conversation?"
+            }})
+        }
+        else if (noresponse > 1) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"I'm sorry, I still didn't hear you."
+                +"Hmm, I still didn't hear you."
+            }})
+            reentry()
+        }
+        else {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"Sorry, I don't think I heard you."
+                +"Sorry, I didn't hear you."
+            }})
+            reentry()
+        }
     }
 }
 
@@ -1196,6 +1786,7 @@ val FeedbackRating = state(Interaction) {
         }
         furhat.ask("Overall, how would you rate our previous conversation? Bad, ok, or good?")
     }
+
     onReentry {
         furhat.ask({random {
             +"How would you rate it?"
@@ -1203,17 +1794,53 @@ val FeedbackRating = state(Interaction) {
             +"Do you think our conversation was bad, ok, or good?"
         }})
     }
+
     onResponse<Bad> {
         furhat.gesture(Gestures.Shake(strength = 0.2), async = false)
         goto(BadDoneDifferently)
     }
+
     onResponse<Ok> {
         furhat.gesture(Gestures.Nod(strength = 0.2), async = true)
         goto(OKDoneDifferently)
     }
+
     onResponse<Good> {
         furhat.gesture(Gestures.Nod(strength = 0.2), async = true)
         goto(LikeMost)
+    }
+
+    var noresponse = 0
+    onNoResponse {
+        noresponse++
+        if (noresponse > 3) {
+            furhat.gesture(Gestures.Thoughtful(strength = 1.0), async = true)
+            furhat.say("Perhaps another time is better. Don't worry about it, you can contact me 24/7.")
+        }
+        else if (noresponse > 2) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.ask({random {
+                +"Are you still there?"
+                +"Are you there?"
+                +"Are you able to continue our conversation?"
+            }})
+        }
+        else if (noresponse > 1) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"I'm sorry, I still didn't hear you."
+                +"Hmm, I still didn't hear you."
+            }})
+            reentry()
+        }
+        else {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"Sorry, I don't think I heard you."
+                +"Sorry, I didn't hear you."
+            }})
+            reentry()
+        }
     }
 }
 
@@ -1226,6 +1853,7 @@ val BadDoneDifferently = state(Interaction){
         }
         furhat.ask("What would you like to see differently next time?")
     }
+
     onReentry {
         furhat.ask({random {
             +"What could I do differently?"
@@ -1233,20 +1861,54 @@ val BadDoneDifferently = state(Interaction){
             +"Which tips do you have for me?"
         }})
     }
+
     onResponse {
         goto(AgreeAndPositive)
+    }
+
+    var noresponse = 0
+    onNoResponse {
+        noresponse++
+        if (noresponse > 3) {
+            furhat.gesture(Gestures.Thoughtful(strength = 1.0), async = true)
+            furhat.say("Perhaps another time is better. Don't worry about it, you can contact me 24/7.")
+        }
+        else if (noresponse > 2) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.ask({random {
+                +"Are you still there?"
+                +"Are you there?"
+                +"Are you able to continue our conversation?"
+            }})
+        }
+        else if (noresponse > 1) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"I'm sorry, I still didn't hear you."
+                +"Hmm, I still didn't hear you."
+            }})
+            reentry()
+        }
+        else {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"Sorry, I don't think I heard you."
+                +"Sorry, I didn't hear you."
+            }})
+            reentry()
+        }
     }
 }
 
 val OKDoneDifferently = state(Interaction){
     onEntry {
-
         furhat.say("I see.")
         parallel {
             goto(LookQuestion)
         }
         furhat.ask("What could I have done differently so that you would have rated the conversation as good?" )
     }
+
     onReentry {
         furhat.ask({random {
             +"What could I do differently?"
@@ -1254,29 +1916,97 @@ val OKDoneDifferently = state(Interaction){
             +"Which tips do you have for me?"
         }})
     }
+
     onResponse {
         goto(AgreeAndPositive)
+    }
+
+    var noresponse = 0
+    onNoResponse {
+        noresponse++
+        if (noresponse > 3) {
+            furhat.gesture(Gestures.Thoughtful(strength = 1.0), async = true)
+            furhat.say("Perhaps another time is better. Don't worry about it, you can contact me 24/7.")
+        }
+        else if (noresponse > 2) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.ask({random {
+                +"Are you still there?"
+                +"Are you there?"
+                +"Are you able to continue our conversation?"
+            }})
+        }
+        else if (noresponse > 1) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"I'm sorry, I still didn't hear you."
+                +"Hmm, I still didn't hear you."
+            }})
+            reentry()
+        }
+        else {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"Sorry, I don't think I heard you."
+                +"Sorry, I didn't hear you."
+            }})
+            reentry()
+        }
     }
 }
 
 
 val LikeMost = state(Interaction){
     onEntry {
-
         furhat.say ( "That's nice to hear.")
         parallel {
             goto(LookQuestion)
         }
         furhat.ask("What did you like most about it?" )
     }
+
     onReentry {
         furhat.ask({random {
             +"Which part did you like the most?"
             +"What did you like most about our conversation?"
         }})
     }
+
     onResponse {
         goto(BetterNextTime)
+    }
+
+    var noresponse = 0
+    onNoResponse {
+        noresponse++
+        if (noresponse > 3) {
+            furhat.gesture(Gestures.Thoughtful(strength = 1.0), async = true)
+            furhat.say("Perhaps another time is better. Don't worry about it, you can contact me 24/7.")
+        }
+        else if (noresponse > 2) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.ask({random {
+                +"Are you still there?"
+                +"Are you there?"
+                +"Are you able to continue our conversation?"
+            }})
+        }
+        else if (noresponse > 1) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"I'm sorry, I still didn't hear you."
+                +"Hmm, I still didn't hear you."
+            }})
+            reentry()
+        }
+        else {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"Sorry, I don't think I heard you."
+                +"Sorry, I didn't hear you."
+            }})
+            reentry()
+        }
     }
 }
 
@@ -1288,6 +2018,7 @@ val BetterNextTime = state(Interaction){
         }
         furhat.ask("Was there also anything that I could do better next time?")
     }
+
     onReentry {
         furhat.ask({random {
             +"What could I still do better?"
@@ -1295,8 +2026,42 @@ val BetterNextTime = state(Interaction){
             +"Which tips do you have for me?"
         }})
     }
+
     onResponse {
         goto(TakeInAccount)
+    }
+
+    var noresponse = 0
+    onNoResponse {
+        noresponse++
+        if (noresponse > 3) {
+            furhat.gesture(Gestures.Thoughtful(strength = 1.0), async = true)
+            furhat.say("Perhaps another time is better. Don't worry about it, you can contact me 24/7.")
+        }
+        else if (noresponse > 2) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.ask({random {
+                +"Are you still there?"
+                +"Are you there?"
+                +"Are you able to continue our conversation?"
+            }})
+        }
+        else if (noresponse > 1) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"I'm sorry, I still didn't hear you."
+                +"Hmm, I still didn't hear you."
+            }})
+            reentry()
+        }
+        else {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"Sorry, I don't think I heard you."
+                +"Sorry, I didn't hear you."
+            }})
+            reentry()
+        }
     }
 }
 
@@ -1309,14 +2074,49 @@ val AgreeAndPositive = state(Interaction){
         }
         furhat.ask("Was there also something that you liked about our conversation?")
     }
+
     onReentry {
         furhat.ask({random {
             +"Was there something you liked?"
             +"Was there perhaps also something that you liked about the conversation?"
         }})
     }
+
     onResponse {
         goto(TakeInAccount)
+    }
+
+    var noresponse = 0
+    onNoResponse {
+        noresponse++
+        if (noresponse > 3) {
+            furhat.gesture(Gestures.Thoughtful(strength = 1.0), async = true)
+            furhat.say("Perhaps another time is better. Don't worry about it, you can contact me 24/7.")
+        }
+        else if (noresponse > 2) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.ask({random {
+                +"Are you still there?"
+                +"Are you there?"
+                +"Are you able to continue our conversation?"
+            }})
+        }
+        else if (noresponse > 1) {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"I'm sorry, I still didn't hear you."
+                +"Hmm, I still didn't hear you."
+            }})
+            reentry()
+        }
+        else {
+            furhat.gesture(Gestures.BrowFrown(strength = 0.8), async = true)
+            furhat.say({random {
+                +"Sorry, I don't think I heard you."
+                +"Sorry, I didn't hear you."
+            }})
+            reentry()
+        }
     }
 }
 
