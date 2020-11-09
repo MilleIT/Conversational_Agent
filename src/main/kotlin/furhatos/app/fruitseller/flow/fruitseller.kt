@@ -1175,6 +1175,9 @@ val AskForFeedback = state(Interaction) {
         } else if (userEmotion == "Happy") {
             furhat.say("I've noticed you are happy. It would be great if you told me what caused you to be happy.")
         }
+        parallel{
+            goto(LookQuestion)
+        }
         var givesFeedback = furhat.askYN("Would you be willing to give me " +
                 "some tips so that I can provide you with a better service in the future?")
         if(givesFeedback!!) {
