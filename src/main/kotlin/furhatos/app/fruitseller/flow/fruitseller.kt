@@ -19,6 +19,9 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
+/*
+ Return random location Furhat should look at.
+ */
 fun Loc(): Location {
     val x = Random.nextInt(-5,5)
     val y = Random.nextInt(-1,5)
@@ -26,6 +29,9 @@ fun Loc(): Location {
     return location
 }
 
+/*
+    Return random location Furhat should look at when asking a question.
+ */
 fun LocQuestion(): Location {
     val i = Random.nextInt(-1,1)
     var x = 0
@@ -41,6 +47,9 @@ fun LocQuestion(): Location {
     return location
 }
 
+/*
+    Make Furhat look at certain location when asking question and after a while look back at user.
+ */
 val LookQuestion = state(Interaction) {
     onEntry {
         furhat.attend(LocQuestion())
@@ -51,7 +60,9 @@ val LookQuestion = state(Interaction) {
     }
 }
 
-
+/*
+    Make Furhat look at certain location and after a while look back at user.
+ */
 val LookAround = state(Interaction) {
     onEntry {
         furhat.attend(Loc())
@@ -61,12 +72,9 @@ val LookAround = state(Interaction) {
 
 }
 
-val MockEmotion = state(Interaction) {
-    onEntry {
-        userEmotion = "Unhappy"
-    }
-}
-
+/*
+ Link python emotion detector with kotlin.
+ */
 fun startCoroutine() {
     GlobalScope.launch {
         val loc = pythonLoc //must be location of python.exe for python 3.6.6
@@ -136,7 +144,6 @@ val Start = state(Interaction) {
     onEntry {
         parallel {
             goto(StartEmotions)
-            //goto(MockEmotion)
         }
         furhat.attend(user = users.random)
         furhat.say("Hello! Welcome to the live support of Bol.com. My name is Furhat and I will be assisting you today. ")
@@ -309,7 +316,6 @@ val SpecifyProblem = state(Interaction) {
     }
 
     onResponse<WrongPackage> {
-        // TODO SAVE THAT PACKAGE IS WRONG
         users.current.book.problem = "received the wrong package"
         goto(Problem)
 
@@ -526,7 +532,7 @@ val ToldStory = state(Interaction) {
 val OrderNumber = state(Interaction) {
     onEntry {
         parallel {
-            goto(LookQuestion) // TODO hij crashed hier heel soms en blijft vast zitten op de attend
+            goto(LookQuestion)
         }
         furhat.ask({random {
             +"Can I have your order number please?"
